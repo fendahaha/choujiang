@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+        .main {
+            width: 1000px;
+            height: 700px;
+            margin: 100px auto;
+            border: 1px solid black;
+            position: relative;
+            /*perspective: 300px;*/
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <style>
+        .card-wrap {
+            width: 102px;
+            height: 152px;
+            border: 1px solid red;
+            position: relative;
+            margin: 100px;
+            perspective: 300px;
+        }
+
+        .card {
+            width: 100px;
+            height: 150px;
+            background-color: rgba(0, 127, 127, 0.37);
+            transform-origin: 0 0 0;
+            transform: translate3d(0px, 0px, 0px) rotate3d(1, 0, 0, 50deg);
+        }
+    </style>
+    <div class="card-wrap">
+        <div class="card">
+            card1
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>3D导航栏</title>
+    <style type="text/css">
+        ul {
+            height: 50px;
+        }
+
+        ul li {
+            float: left;
+            list-style: none;
+            margin: 0 10px;
+            /* 一会我们需要给box 旋转 也需要透视 干脆给li加 里面的子盒子都有透视效果 */
+            perspective: 400px;
+        }
+
+        .box {
+            position: relative;
+            width: 200px;
+            height: 50px;
+            margin: 200px auto;
+            transform-style: preserve-3d;
+            transition: all 0.6s;
+        }
+
+        .box:hover {
+            transform: rotateX(90deg);
+        }
+
+        .box .front,
+        .box .bottom {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: pink;
+            text-align: center;
+            line-height: 50px;
+        }
+
+        .box .front {
+            z-index: 1;
+            transform: translateZ(25px);
+        }
+
+        .box .bottom {
+            background-color: paleturquoise;
+            /* 如果既要移动又要写其他样式,则必须把移动写在最前面！ */
+            /* 这个x轴一定是负值 */
+            /* 我们如果有移动 或者其他样式，必须先写我们的移动 */
+            transform: translateY(50%) rotateX(-90deg);
+
+        }
+    </style>
+</head>
+<body>
+<ul>
+    <li>
+        <div class="box">
+            <div class="front">前端</div>
+            <div class="bottom">后端</div>
+
+        </div>
+    </li>
+    <li>
+        <div class="box">
+            <div class="front">前端</div>
+            <div class="bottom">后端</div>
+
+        </div>
+    </li>
+    <li>
+        <div class="box">
+            <div class="front">前端</div>
+            <div class="bottom">后端</div>
+
+        </div>
+    </li>
+    <li>
+        <div class="box">
+            <div class="front">前端</div>
+            <div class="bottom">后端</div>
+
+        </div>
+    </li>
+    <li>
+        <div class="box">
+            <div class="front">前端</div>
+            <div class="bottom">后端</div>
+
+        </div>
+    </li>
+</ul>
+
+</body>
+</html>
