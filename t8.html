@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽奖转盘</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .wheel-container {
+            text-align: center;
+        }
+
+        .wheel {
+            width: 200px;
+            height: 200px;
+            border: 2px solid #333;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wheel-section {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-origin: 100%;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+
+        .wheel-section:nth-child(1) {
+            background-color: #f44336;
+            transform: rotate(0deg);
+        }
+
+        .wheel-section:nth-child(2) {
+            background-color: #2196F3;
+            transform: rotate(60deg);
+        }
+
+        .wheel-section:nth-child(3) {
+            background-color: #4CAF50;
+            transform: rotate(120deg);
+        }
+
+        .wheel-section:nth-child(4) {
+            background-color: #FFC107;
+            transform: rotate(180deg);
+        }
+
+        .wheel-section:nth-child(5) {
+            background-color: #9C27B0;
+            transform: rotate(240deg);
+        }
+
+        .wheel-section:nth-child(6) {
+            background-color: #FF5722;
+            transform: rotate(300deg);
+        }
+
+        .spin-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+<div class="wheel-container">
+    <div class="wheel">
+        <div class="wheel-section">1</div>
+        <div class="wheel-section">2</div>
+        <div class="wheel-section">3</div>
+        <div class="wheel-section">4</div>
+        <div class="wheel-section">5</div>
+        <div class="wheel-section">6</div>
+    </div>
+    <button class="spin-button" onclick="spinWheel()">抽奖</button>
+</div>
+<script>
+    let spinning = false;
+
+    function spinWheel() {
+        if (!spinning) {
+            spinning = true;
+            const wheel = document.querySelector(".wheel");
+
+            // Generate a random degree to spin the wheel
+            const randomDegree = Math.floor(Math.random() * 3600) + 1800; // Adjust speed by changing values
+            const totalRotation = randomDegree + 1080; // Adjust initial rotation as needed
+
+            wheel.style.transition = "transform 4s ease-out";
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+
+            setTimeout(() => {
+                spinning = false;
+                wheel.style.transition = "none";
+                const winner = getWinnerSection(totalRotation % 360);
+                alert(`恭喜抽中奖品 ${winner}`);
+            }, 4000); // Adjust time to match transition duration
+        }
+    }
+
+    function getWinnerSection(degrees) {
+        const sections = ["1", "2", "3", "4", "5", "6"];
+        const degreeStep = 60;
+        const index = Math.floor((degrees % 360) / degreeStep);
+        return sections[index];
+    }
+
+</script>
+</body>
+</html>

@@ -86,7 +86,6 @@
     }
 
     const data = get_data(30);
-    const container = document.getElementById("main");
 
     function createItemHtml(d) {
         return `<div class="item" id="${d.name}">${d.id}</div>`
@@ -94,29 +93,14 @@
 
     function renderItems(items) {
         let html = items.map((i) => createItemHtml(i)).join('');
-        // container.innerHTML = html;
         $("#main").append(html)
     }
 
     renderItems(data);
 </script>
 <script>
-    function getOffsets(_p, _c) {
-        let p = document.getElementById(_p);
+    function getOffsets(_c) {
         let c = document.getElementById(_c);
-        let parent = {
-            left_border_width: p.clientLeft,
-            top_border_width: p.clientTop,
-            offsetLeft: p.offsetLeft,
-            offsetTop: p.offsetTop,
-        };
-        let child = {
-            offsetLeft: c.offsetLeft,
-            offsetTop: c.offsetTop,
-        };
-
-        // let left = child.offsetLeft - parent.offsetLeft - parent.left_border_width;
-        // let top = child.offsetTop - parent.offsetTop - parent.top_border_width;
         return {left: c.offsetLeft, top: c.offsetTop}
     }
 
@@ -127,7 +111,7 @@
     const choose_next = () => {
         const n = getRandowNum();
         next_data.next = n;
-        const offsets = getOffsets('main', `item${n}`);
+        const offsets = getOffsets(`item${n}`);
         $("#choose").css(offsets)
     }
     let intervalId = null;
