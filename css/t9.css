@@ -48,7 +48,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    transition: all 0.1s;
+    /*transition: all 0.1s;*/
     border: 8px solid #F06501;
     background-color: white;
 }
@@ -132,7 +132,7 @@
     padding: 10px;
 }
 
-.button {
+.buttons .button {
     box-shadow: 0px 0px 15px rgb(127 255 255 / 75%);
     color: rgba(127, 255, 255, 0.75);
     background: transparent;
@@ -140,14 +140,23 @@
     border: 0;
     padding: 10px 20px;
     cursor: pointer;
+    margin: 0 10px;
 }
 
-.button.stop_lottery {
+.buttons .button .state {
+    display: none;
+}
+
+.buttons .button.disable .state {
+    display: inline;
+}
+
+.buttons .button.disable .name {
+    display: none;
+}
+
+.buttons .button.stop_lottery {
     box-shadow: 0px 0px 15px rgb(255 0 0 / 75%);
     outline: 1px solid rgba(255, 0, 0, 0.75);
     color: rgba(255, 0, 0, 0.75);
-}
-
-.stop_lottery {
-    display: none;
 }

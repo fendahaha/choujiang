@@ -26,9 +26,18 @@
         <div class="cj-container-hidden-persons"></div>
     </div>
     <div class="buttons">
-        <button class="button" id="start_lottery">开始抽奖</button>
-        <button class="button stop_lottery" id="stop_lottery">停止抽奖</button>
-        <button class="button" id="test">test</button>
+        <button class="button" id="go_to_lottery">
+            <span class="state">Loading...</span>
+            <span class="name">进入抽奖</span>
+        </button>
+        <button class="button" id="start_lottery" style="display: none">
+            <span class="state">Loading...</span>
+            <span class="name">开始抽奖</span>
+        </button>
+        <button class="button stop_lottery" id="stop_lottery" style="display: none">
+            <span class="state">Loading...</span>
+            <span class="name">停止抽奖</span>
+        </button>
     </div>
 </div>
 <script src="/js/t9.js"/>
