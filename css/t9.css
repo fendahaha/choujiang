@@ -14,9 +14,10 @@
     justify-content: center;
     overflow: hidden;
     /*border: 2px solid red;*/
+    position: relative;
 }
 
-.cj-container-content {
+.cj-container-show-persons {
     width: calc(17 * 100px + 16 * 20px);
     height: calc(7 * 126px + 6 * 20px);
     perspective: 1000px;
@@ -24,6 +25,14 @@
     grid-template-columns: repeat(17, 100px);
     grid-template-rows: repeat(7, 126px);
     grid-gap: 20px;
+}
+
+.cj-container-hidden-persons {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    border:2px solid blue;
 }
 
 /*######################*/
@@ -50,7 +59,6 @@
     height: 126px;
     position: relative;
     display: inline-block;
-    float: left;
     transform-style: preserve-3d;
     transform: translate3d(0, 0, 0) rotateY(0deg);
 }
@@ -94,7 +102,7 @@
     justify-content: center;
 }
 
-.cj-container-content.show_back .cj-person-back {
+.cj-container-show-persons.show_back .cj-person-back {
     display: flex;
 }
 

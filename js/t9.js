@@ -24,7 +24,7 @@ const prize_util = {
 /**############################*/
 console.log(window.innerWidth, window.innerHeight);
 let rate = window.innerWidth * 0.6 / (17 * 100 + 16 * 20)
-$(".cj-container-content").css('transform', `scale(${rate})`)
+$(".cj-container-show-persons").css('transform', `scale(${rate})`)
 /**############################*/
 const persons = [...Array(130).keys()].map(e => {
     return {
@@ -45,72 +45,127 @@ const create_person = (e) => {
             <div class="cj-person-back"></div>
         </div>`
 }
-const show_person = () => {
+const render_show_person = () => {
     const persons_html = persons_show.map(e => create_person(e)).join('');
-    $(".cj-person").remove();
-    $(".cj-container-content").append(persons_html)
+    $(".cj-container-show-persons .cj-person").remove();
+    $(".cj-container-show-persons").append(persons_html);
 }
-
-function choose_random_point() {
+const render_hide_person = () => {
+    const persons_html = persons_hide.map(e => create_person(e)).join('');
+    $(".cj-container-hidden-persons .cj-person").remove();
+    $(".cj-container-hidden-persons").append(persons_html);
+}
+const choose_random_point = () => {
     let w = Math.floor(Math.random() * (window.innerWidth - 100));
     let h = Math.floor(Math.random() * (window.innerHeight - 140));
     return {left: w, top: h}
 }
+let random_place_person_animations = [];
+let random_place_person_animations_finished = true;
 
 function random_place_person() {
-    $(".cj-person").css('transition', 'none')
-    persons_show.forEach(e => {
-        let $target = $(`#${e.name}`);
-        const bcr = $target[0].getBoundingClientRect();
-        const point = choose_random_point();
-        let x = (point.left - bcr.left) * 1.9;
-        let y = (point.top - bcr.top) * 1.9;
-        let z = Math.floor(Math.random() * 500) - 250
-        $target.css('transform', `translate3d(${x}px, ${y}px, ${z}px) rotateY(0deg)`)
-    })
-    window.requestAnimationFrame(function (time) {
-        window.requestAnimationFrame(function (time) {
-            persons_show.forEach(e => {
-                let $target = $(`#${e.name}`);
-                $target.css('transform', 'translate3d(0,0,0) rotateY(360deg)');
-                $target.css('transition', `all ${Math.random() + 2}s ease-in`)
+    // $(".cj-person").css('transition', 'none')
+    // window.requestAnimationFrame(function (time) {
+    //     window.requestAnimationFrame(function (time) {
+    //         persons_show.forEach(e => {
+    //             let $target = $(`#${e.name}`);
+    //             $target.css('transform', 'translate3d(0,0,0) rotateY(360deg)');
+    //             $target.css('transition', `all ${Math.random() + 2}s ease-in`)
+    //         })
+    //     });
+    // });
+    // persons_show.forEach(e => {
+    //     let $target = $(`#${e.name}`);
+    //     const bcr = $target[0].getBoundingClientRect();
+    //     const point = choose_random_point();
+    //     let x = (point.left - bcr.left) * 1.9;
+    //     let y = (point.top - bcr.top) * 1.9;
+    //     let z = Math.floor(Math.random() * 500) - 250;
+    //     $target.css('transform', `translate3d(${x}px, ${y}px, ${z}px) rotateY(0deg)`)
+    // })
+    if (random_place_person_animations_finished) {
+        random_place_person_animations_finished = false;
+        persons_show.forEach(e => {
+            let $target = $(`#${e.name}`);
+            const bcr = $target[0].getBoundingClientRect();
+            const point = choose_random_point();
+            let x = (point.left - bcr.left) * 1.9;
+            let y = (point.top - bcr.top) * 1.9;
+            let z = Math.floor(Math.random() * 500) - 250;
+
+            let target = $(`#${e.name}`)[0];
+            const keyframes = [
+                {transform: `translate3d(${x}px, ${y}px, ${z}px) rotateY(0deg)`, offset: 0},
+                {transform: 'translate3d(0,0,0) rotateY(360deg)', offset: 1},
+            ];
+            const options = {
+                fill: "forwards",
+                // easing: "steps(4, end)",
+                easing: "ease-in",
+                duration: (Math.random() + 2) * 1000,
+                iterations: 1,
+            };
+            const animate = target.animate(keyframes, options);
+            random_place_person_animations.push(animate);
+        })
+        Promise.all(
+            random_place_person_animations.map((animation) => animation.finished),
+        ).then(() => {
+            random_place_person_animations.forEach(a => {
+                a.commitStyles();
+                a.cancel();
             })
+            random_place_person_animations = [];
+            random_place_person_animations_finished = true;
         });
-    });
+    }
 }
 
-show_person();
+render_show_person();
+render_hide_person();
 random_place_person();
+/**###########################*/
 let updating_timeout_id = null;
 let updating_interval_id = null;
 const stop_updating = () => {
     clearTimeout(updating_timeout_id);
     clearInterval(updating_interval_id);
 }
+const update = () => {
+    let hide_index = Math.floor(Math.random() * persons_hide.length);
+    let show_index = Math.floor(Math.random() * persons_show.length);
+    let $hide_target = $(`#${persons_hide[hide_index].name}`);
+    let $show_target = $(`#${persons_show[show_index].name}`);
+    let temp = persons_show[show_index];
+    persons_show[show_index] = persons_hide[hide_index];
+    persons_hide[hide_index] = temp;
+    let hide_clone = $hide_target.clone();
+    let show_clone = $show_target.clone();
+    $hide_target.replaceWith(show_clone);
+    $show_target.replaceWith(hide_clone);
+    const target = $(`#${persons_show[show_index].name} .cj-person-front`)[0];
+    const keyframes = [
+        // {backgroundColor: `yellow`, offset: 0.5},
+        {backgroundColor: `rgba(0, 127, 127, ${(Math.random() * 6 + 2) / 10})`, offset: 1},
+    ];
+    const options = {
+        fill: "forwards",
+        duration: 1000,
+        iterations: 1,
+    };
+    target.animate(keyframes, options).persist()
+}
 const start_updating = () => {
     updating_interval_id = setInterval(() => {
-        let random_index = Math.floor(Math.random() * persons_hide.length);
-        let random_index2 = Math.floor(Math.random() * persons_show.length);
-        let temp = persons_show[random_index2];
-        persons_show[random_index2] = persons_hide[random_index];
-        persons_hide[random_index] = temp;
-        $(`#${persons_hide[random_index].name}`).replaceWith(create_person(persons_show[random_index2]))
-        const target = $(`#${persons_show[random_index2].name} .cj-person-front`)[0];
-        const keyframes = [
-            // {backgroundColor: `yellow`, offset: 0.5},
-            {backgroundColor: `rgba(0, 127, 127, ${(Math.random() * 6 + 2) / 10})`, offset: 1},
-        ];
-        const options = {
-            fill: "forwards",
-            duration: 1000,
-            iterations: 1,
-        };
-        target.animate(keyframes, options).finished.then((animate) => animate.commitStyles());
+        // update()
     }, 100)
 }
 updating_timeout_id = setTimeout(() => {
-    start_updating();
-}, 3000)
+    // start_updating();
+}, 4000)
+$("#test").on('click', () => {
+    update()
+})
 
 /**#############################*/
 function getOffsets(_c) {
@@ -136,7 +191,7 @@ const change_lottery_status = (is_lottery) => {
 
         stop_updating();
         setTimeout(() => {
-            $(".cj-container-content").addClass("show_back")
+            $(".cj-container-show-persons").addClass("show_back")
             $(".cj-person").css('transition', 'all 1s');
             $(".cj-person").css('transform', 'translate3d(0, 0, 0) rotateY(180deg)');
             setTimeout(() => {
@@ -148,7 +203,7 @@ const change_lottery_status = (is_lottery) => {
         $("#start_lottery").show();
         $("#stop_lottery").hide();
         clearInterval(intervalId)
-        $(".cj-container-content").removeClass("show_back")
+        $(".cj-container-show-persons").removeClass("show_back")
         $(".cj-person").css('transition', 'all 1s');
         $(".cj-person").css('transform', 'translate3d(0, 0, 0) rotateY(0deg)');
         $("#cj-choose").hide()
