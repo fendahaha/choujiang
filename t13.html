@@ -36,7 +36,6 @@
             transform-style: preserve-3d;
             transform-origin: center center 0;
             transform: translate3d(0, 0, -2000px) rotateX(-0deg) rotateY(0deg);
-            /*transform: scale(0.3) rotateX(-0deg);*/
         }
 
         .card {
@@ -77,6 +76,7 @@
 <div class="buttons">
     <button id="start">start</button>
     <button id="stop">stop</button>
+    <button id="set">set</button>
 </div>
 <script>
     const generate_cards = (n) => {
@@ -97,14 +97,26 @@
         {transform: `translate3d(0, 0, -2000px) rotateX(-0deg) rotateY(${10000 * 360}deg)`, offset: 1},
     ];
     const options = {fill: "forwards", easing: "linear", duration: 10000 * 10000, iterations: 1,};
-    const animation = $(".box")[0].animate(keyframes, options);
-
-
+    // const animation = $(".box")[0].animate(keyframes, options);
     $("#start").on('click', () => {
         animation.play()
     })
     $("#stop").on('click', () => {
         animation.pause()
+    })
+
+    $("#set").on('click', () => {
+        const keyframes = [
+            {transform: `translate3d(0, 0, 0px) rotateX(0deg) rotateY(${0}deg) scale(5)`, offset: 1},
+        ];
+        const options = {fill: "forwards", easing: "linear", duration: 2000, iterations: 1,};
+        $(".card.card-9")[0].animate(keyframes, options).finished.then(() => {
+            const keyframes = [
+                {transform: `translate3d(0, 0, 800px) rotateY(${0}deg) rotateX(${330}deg) scale(1)`, offset: 1},
+            ];
+            const options = {fill: "forwards", easing: "linear", duration: 2000, iterations: 1,};
+            $(".card.card-9")[0].animate(keyframes, options)
+        })
     })
 </script>
 </body>

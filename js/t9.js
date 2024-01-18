@@ -80,25 +80,6 @@ const random_place_person = {
         return {left: w, top: h}
     },
     start: function () {
-        // $(".cj-person").css('transition', 'none')
-        // window.requestAnimationFrame(function (time) {
-        //     window.requestAnimationFrame(function (time) {
-        //         persons_show.forEach(e => {
-        //             let $target = $(`#${e.name}`);
-        //             $target.css('transform', 'translate3d(0,0,0) rotateY(360deg)');
-        //             $target.css('transition', `all ${Math.random() + 2}s ease-in`)
-        //         })
-        //     });
-        // });
-        // persons_show.forEach(e => {
-        //     let $target = $(`#${e.name}`);
-        //     const bcr = $target[0].getBoundingClientRect();
-        //     const point = choose_random_point();
-        //     let x = (point.left - bcr.left) * 1.9;
-        //     let y = (point.top - bcr.top) * 1.9;
-        //     let z = Math.floor(Math.random() * 500) - 250;
-        //     $target.css('transform', `translate3d(${x}px, ${y}px, ${z}px) rotateY(0deg)`)
-        // })
         if (this.random_place_person_animations_finished) {
             this.random_place_person_animations_finished = false;
             persons_show.forEach(e => {
@@ -289,13 +270,6 @@ const choose_manager = {
             const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
             const animate = $target[0].animate(keyframes, options);
             return animate.finished.then((a) => a.commitStyles())
-            // const keyframes2 = [{backgroundColor: 'rgba(245,108,3,0.8)'}];
-            // const options2 = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
-            // const animate2 = $target.find(".cj-person-back")[0].animate(keyframes2, options2)
-            // return Promise.all([animate.finished, animate2.finished]).then(() => {
-            //     animate.commitStyles();
-            //     animate2.commitStyles();
-            // })
         })
     },
     hide_choose_target: function () {
@@ -307,14 +281,6 @@ const choose_manager = {
             a.commitStyles();
             $target.css('z-index', '0');
         })
-        // const keyframes2 = [{backgroundColor: 'darkolivegreen'}];
-        // const options2 = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
-        // const animate2 = $target.find(".cj-person-back")[0].animate(keyframes2, options2)
-        // return Promise.all([animate.finished, animate2.finished]).then(() => {
-        //     animate.commitStyles();
-        //     animate2.commitStyles();
-        //     $target.css('z-index', '0')
-        // })
     },
 }
 /**###############################*/
@@ -337,22 +303,15 @@ $("#go_to_lottery").on('click', () => {
         loading = true;
         buttons_manager.show('loading')
         updating_manager.stop_updating().then(() => {
+            $(".cj-container-show-persons .cj-person-back").css('opacity', '1');
+            $(".cj-container-show-persons .cj-person-front").css('backface-visibility', 'hidden');
             const animations = persons_show.map(e => {
                 const keyframes = [{transform: 'translate3d(0, 0, 0) rotateY(180deg)'}];
                 const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
                 const animate = $(`#${e.id}`)[0].animate(keyframes, options);
-                animate.finished.then((a) => {
+                return animate.finished.then((a) => {
                     a.commitStyles()
                 })
-
-                const keyframes2 = [{opacity: 1}];
-                const options2 = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
-                const animate2 = $(`#${e.id}`).find('.cj-person-back')[0].animate(keyframes2, options2);
-                animate2.finished.then((a) => {
-                    a.commitStyles()
-                })
-
-                return Promise.all([animate.finished, animate2.finished])
             })
             Promise.all(animations).then(() => {
                 loading = false;
@@ -369,20 +328,13 @@ $("#quit_lottery").on('click', () => {
             const keyframes = [{transform: 'translate3d(0, 0, 0) rotateY(0deg)'}];
             const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
             const animate = $(`#${e.id}`)[0].animate(keyframes, options);
-            animate.finished.then((a) => {
+            return animate.finished.then((a) => {
                 a.commitStyles()
             })
-
-            const keyframes2 = [{opacity: 0}];
-            const options2 = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
-            const animate2 = $(`#${e.id}`).find('.cj-person-back')[0].animate(keyframes2, options2);
-            animate2.finished.then((a) => {
-                a.commitStyles()
-            })
-
-            return Promise.all([animate.finished, animate2.finished])
         })
         Promise.all(animations).then(() => {
+            $(".cj-container-show-persons .cj-person-back").css('opacity', '0');
+            $(".cj-container-show-persons .cj-person-front").css('backface-visibility', 'visible');
             updating_manager.start_updating()
             buttons_manager.show('go_to_lottery');
             loading = false;

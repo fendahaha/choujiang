@@ -77,6 +77,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
+
+    backface-visibility: visible;
 }
 
 .cj-person-back {
@@ -89,7 +91,8 @@
     background-color: darkolivegreen;
     opacity: 0;
     color: white;
-    transform: translateZ(-0.1px) rotateY(180deg);
+    backface-visibility: hidden;
+    transform: translateZ(0px) rotateY(180deg);
     display: flex;
     align-items: center;
     justify-content: center;
