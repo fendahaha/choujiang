@@ -25,6 +25,8 @@ const prize_util = {
 console.log(window.innerWidth, window.innerHeight);
 let rate = window.innerWidth * 0.6 / (17 * 100 + 16 * 20)
 $(".cj-container-show-persons").css('transform', `scale(${rate})`)
+const bcr = $(".cj-container-show-persons")[0].getBoundingClientRect();
+const center_point = {x: bcr.x + bcr.width / 2, y: bcr.y + bcr.height / 2}
 /**############################*/
 const persons = [...Array(130).keys()].map(e => {
     return {
@@ -66,7 +68,7 @@ const person_manager = {
     },
     render_person: function () {
         this.render_show_person();
-        this.render_hide_person();
+        // this.render_hide_person();
     }
 }
 const random_place_person = {
@@ -127,7 +129,7 @@ const random_place_person = {
                 this.random_place_person_animations.map((animation) => animation.finished),
             ).then(() => {
                 _this.random_place_person_animations.forEach(a => {
-                    a.commitStyles();
+                    // a.commitStyles();
                     a.cancel();
                 })
                 _this.random_place_person_animations = [];
@@ -166,25 +168,23 @@ const updating_manager = {
             iterations: 1,
         };
         const animation = target.animate(keyframes, options)
-        this.last_update_animation = animation;
         animation.persist();
+        this.last_update_animation = animation;
     },
     start_updating: function () {
         if (!this.loading) {
             this.loading = true;
             if (this.is_updating) {
                 this.loading = false;
-                return Promise.resolve(undefined)
+                return
             }
             this.is_updating = true;
             console.log('start');
             const _this = this;
-            return random_place_person.finished().then(() => {
-                _this.updating_interval_id = setInterval(() => {
-                    _this.update();
-                }, 100);
-                _this.loading = false;
-            })
+            this.updating_interval_id = setInterval(() => {
+                _this.update();
+            }, 100);
+            this.loading = false;
         }
     },
     stop_updating: function () {
@@ -205,13 +205,12 @@ const updating_manager = {
         return Promise.resolve(undefined)
     }
 }
-
 person_manager.render_person();
-random_place_person.start();
-random_place_person.finished().then(() => {
+random_place_person.start().finished().then(() => {
     updating_manager.start_updating();
+    $("#go_to_lottery").show();
 });
-
+// $("#go_to_lottery").show();
 /**#############################*/
 const choose_manager = {
     choose_data: {current: null},
@@ -225,7 +224,7 @@ const choose_manager = {
     },
     choose_next: function () {
         const n = Math.floor(Math.random() * persons_show.length);
-        this.choose_data.current = n;
+        this.choose_data.current = persons_show[n];
         const offsets = this.getOffsets(persons_show[n].id);
         const keyframes = [
             {left: offsets.left + 'px', top: offsets.top + 'px'},
@@ -247,7 +246,6 @@ const choose_manager = {
                 this.loading = false;
                 return
             }
-            console.log("start choose");
             $("#cj-choose").show();
             const _this = this;
             this.choose_intervalId = setInterval(() => _this.choose_next(), 100);
@@ -262,93 +260,188 @@ const choose_manager = {
                 this.loading = false;
                 return Promise.resolve(undefined)
             }
-            console.log("stop choose");
             clearInterval(this.choose_intervalId);
             const _this = this;
             return this.last_animation.finished.then(() => {
-                console.log(_this.choose_data);
-                // $("#cj-choose").hide();
-                _this.is_choosing = false;
-                _this.loading = false;
+                return _this.show_choose_target().then(() => {
+                    _this.is_choosing = false;
+                    _this.loading = false;
+                })
             })
         } else {
             return Promise.resolve(undefined)
         }
     },
+    show_choose_target: function () {
+        return new Promise(function (resolve, reject) {
+            setTimeout(() => {
+                resolve(true)
+            }, 400)
+        }).then(() => {
+            $("#cj-choose").hide();
+            const $target = $(`#${choose_manager.choose_data.current.id}`);
+            $target.css('z-index', '1');
+            const bcr = $target[0].getBoundingClientRect();
+            const point = {x: bcr.x + bcr.width / 2, y: bcr.y + bcr.height / 2}
+            let x = (center_point.x - point.x) / rate;
+            let y = (center_point.y - point.y) / rate;
+            const keyframes = [{transform: `translate3d(${x}px, ${y}px, 800px) rotateY(0deg)`}];
+            const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
+            const animate = $target[0].animate(keyframes, options);
+            return animate.finished.then((a) => a.commitStyles())
+            // const keyframes2 = [{backgroundColor: 'rgba(245,108,3,0.8)'}];
+            // const options2 = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
+            // const animate2 = $target.find(".cj-person-back")[0].animate(keyframes2, options2)
+            // return Promise.all([animate.finished, animate2.finished]).then(() => {
+            //     animate.commitStyles();
+            //     animate2.commitStyles();
+            // })
+        })
+    },
+    hide_choose_target: function () {
+        const $target = $(`#${this.choose_data.current.id}`);
+        const keyframes = [{transform: `translate3d(0px, 0px, 0px) rotateY(180deg)`}];
+        const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
+        const animate = $target[0].animate(keyframes, options);
+        return animate.finished.then((a) => {
+            a.commitStyles();
+            $target.css('z-index', '0');
+        })
+        // const keyframes2 = [{backgroundColor: 'darkolivegreen'}];
+        // const options2 = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
+        // const animate2 = $target.find(".cj-person-back")[0].animate(keyframes2, options2)
+        // return Promise.all([animate.finished, animate2.finished]).then(() => {
+        //     animate.commitStyles();
+        //     animate2.commitStyles();
+        //     $target.css('z-index', '0')
+        // })
+    },
+}
+/**###############################*/
+const buttons_manager = {
+    hideAll: () => {
+        $(".buttons > button").hide()
+    },
+    hide: (...ids) => {
+        ids.forEach(e => $(`#${e}`).hide())
+    },
+    show: function (...ids) {
+        this.hideAll();
+        ids.forEach(e => $(`#${e}`).show())
+    }
 }
 
-// $("#test1").on('click', () => {
-//     choose_manager.start_choose()
-// })
-// $("#test2").on('click', () => {
-//     choose_manager.stop_choose()
-// })
-/**###############################*/
-
-// $("#go_to_lottery")
-// $("#start_lottery")
-// $("#stop_lottery")
 let loading = false;
 $("#go_to_lottery").on('click', () => {
     if (!loading) {
         loading = true;
-        $("#go_to_lottery").addClass('disable');
-        random_place_person.finished().then(() => {
-            updating_manager.stop_updating().then(() => {
-                $(".cj-container-show-persons").addClass("show_back")
-                $(".cj-container-show-persons .cj-person").css('transition', 'all 1s');
-                $(".cj-container-show-persons .cj-person").css('transform', 'translate3d(0, 0, 0) rotateY(180deg)');
-                setTimeout(() => {
-                    loading = false;
-                    $("#go_to_lottery").removeClass('disable');
-                    $("#go_to_lottery").hide();
-                    $("#start_lottery").show();
-                    $("#stop_lottery").hide();
-                }, 1000)
+        buttons_manager.show('loading')
+        updating_manager.stop_updating().then(() => {
+            const animations = persons_show.map(e => {
+                const keyframes = [{transform: 'translate3d(0, 0, 0) rotateY(180deg)'}];
+                const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
+                const animate = $(`#${e.id}`)[0].animate(keyframes, options);
+                animate.finished.then((a) => {
+                    a.commitStyles()
+                })
+
+                const keyframes2 = [{opacity: 1}];
+                const options2 = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
+                const animate2 = $(`#${e.id}`).find('.cj-person-back')[0].animate(keyframes2, options2);
+                animate2.finished.then((a) => {
+                    a.commitStyles()
+                })
+
+                return Promise.all([animate.finished, animate2.finished])
             })
-        });
+            Promise.all(animations).then(() => {
+                loading = false;
+                buttons_manager.show('start_lottery', 'quit_lottery')
+            })
+        })
     }
 });
+$("#quit_lottery").on('click', () => {
+    if (!loading) {
+        loading = true;
+        buttons_manager.show('loading');
+        const animations = persons_show.map(e => {
+            const keyframes = [{transform: 'translate3d(0, 0, 0) rotateY(0deg)'}];
+            const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
+            const animate = $(`#${e.id}`)[0].animate(keyframes, options);
+            animate.finished.then((a) => {
+                a.commitStyles()
+            })
 
+            const keyframes2 = [{opacity: 0}];
+            const options2 = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
+            const animate2 = $(`#${e.id}`).find('.cj-person-back')[0].animate(keyframes2, options2);
+            animate2.finished.then((a) => {
+                a.commitStyles()
+            })
+
+            return Promise.all([animate.finished, animate2.finished])
+        })
+        Promise.all(animations).then(() => {
+            updating_manager.start_updating()
+            buttons_manager.show('go_to_lottery');
+            loading = false;
+        })
+    }
+})
 
 let is_lottery = false;
-const change_lottery_status = (is_lottery) => {
-    if (is_lottery) {
-        $("#start_lottery").hide();
-        $("#stop_lottery").show();
-
-        updating_manager.stop_updating().then(() => {
-            $(".cj-container-show-persons").addClass("show_back")
-            $(".cj-container-show-persons .cj-person").css('transition', 'all 1s');
-            $(".cj-container-show-persons .cj-person").css('transform', 'translate3d(0, 0, 0) rotateY(180deg)');
-            setTimeout(() => {
-                choose_manager.start_choose()
-            }, 1000)
-        })
-    } else {
-        $("#start_lottery").show();
-        $("#stop_lottery").hide();
-        choose_manager.stop_choose().then(() => {
-            $(".cj-container-show-persons").removeClass("show_back")
-            $(".cj-container-show-persons .cj-person").css('transition', 'all 1s');
-            $(".cj-container-show-persons .cj-person").css('transform', 'translate3d(0, 0, 0) rotateY(0deg)');
-            setTimeout(() => {
-                updating_manager.start_updating();
-            }, 1000)
-        })
-
-    }
-}
 $("#start_lottery").on('click', () => {
-    if (!is_lottery) {
-        is_lottery = true;
-        change_lottery_status(is_lottery);
+    if (!loading) {
+        loading = true;
+        buttons_manager.show('loading')
+        if (!is_lottery) {
+            choose_manager.start_choose()
+            is_lottery = true;
+            buttons_manager.show('stop_lottery')
+            loading = false;
+        } else {
+            buttons_manager.show('stop_lottery')
+            loading = false;
+        }
+    }
+})
+let is_confirm_lottery = false;
+$("#stop_lottery").on('click', () => {
+    const action_ended = () => {
+        is_lottery = false;
+        is_confirm_lottery = true;
+        buttons_manager.show('confirm_lottery')
+        loading = false;
+    }
+    if (!loading) {
+        loading = true;
+        buttons_manager.show('loading')
+        if (!is_lottery) {
+            action_ended()
+        }
+        choose_manager.stop_choose().then(() => {
+            action_ended()
+        })
     }
 })
 
-$("#stop_lottery").on('click', () => {
-    if (is_lottery) {
-        is_lottery = false;
-        change_lottery_status(is_lottery);
+$("#confirm_lottery").on('click', () => {
+    const action_ended = () => {
+        choose_manager.hide_choose_target().then(() => {
+            is_confirm_lottery = false
+            buttons_manager.show('start_lottery', 'quit_lottery')
+            loading = false;
+        })
+    }
+    if (!loading) {
+        loading = true;
+        buttons_manager.show('loading')
+        if (!is_confirm_lottery) {
+            action_ended()
+            return
+        }
+        action_ended()
     }
 })
+

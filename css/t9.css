@@ -18,6 +18,7 @@
 }
 
 .cj-container-show-persons {
+    /*border: 2px solid red;*/
     width: calc(17 * 100px + 16 * 20px);
     height: calc(7 * 126px + 6 * 20px);
     perspective: 1000px;
@@ -27,33 +28,24 @@
     grid-gap: 20px;
 }
 
-.cj-container-hidden-persons {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    left: 0;
-    border: 2px solid blue;
-    display: none;
-}
-
 /*######################*/
 .cj-choose {
     z-index: 999;
     min-width: 0;
     min-height: 0;
-    /*display: inline-block;*/
-    display: none;
+    display: inline-block;
     width: 100px;
     height: 126px;
     position: absolute;
     left: 0;
     top: 0;
-    /*transition: all 0.1s;*/
-    border: 8px solid #F06501;
-    background-color: white;
+    /*border: 8px solid #F06501;*/
+    /*background-color: white;*/
+    background-color: #F06705;
 }
 
 .cj-person {
+    z-index: 0;
     min-width: 0;
     min-height: 0;
     width: 100px;
@@ -62,10 +54,6 @@
     display: inline-block;
     transform-style: preserve-3d;
     transform: translate3d(0, 0, 0) rotateY(0deg);
-}
-
-.cj-person.hide {
-    display: none;
 }
 
 .cj-person-front {
@@ -99,16 +87,12 @@
     right: 0;
     bottom: 0;
     background-color: darkolivegreen;
+    opacity: 0;
     color: white;
     transform: translateZ(-0.1px) rotateY(180deg);
-    /*display: flex;*/
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.cj-container-show-persons.show_back .cj-person-back {
-    display: flex;
 }
 
 .cj-person-front-1 {

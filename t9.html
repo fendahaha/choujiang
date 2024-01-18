@@ -13,7 +13,7 @@
 <div class="main">
     <div class="cj-container">
         <div class="cj-container-show-persons">
-            <div class="cj-choose" id="cj-choose"></div>
+            <div class="cj-choose" id="cj-choose" style="display: none"></div>
             <div class="cj-person" id="p-0">
                 <div class="cj-person-back"></div>
                 <div class="cj-person-front">
@@ -23,10 +23,12 @@
                 </div>
             </div>
         </div>
-        <div class="cj-container-hidden-persons"></div>
     </div>
     <div class="buttons">
-        <button class="button" id="go_to_lottery">
+        <button class="button" id="loading" style="display: none">
+            <span class="name">Loading...</span>
+        </button>
+        <button class="button" id="go_to_lottery" style="display: none">
             <span class="state">Loading...</span>
             <span class="name">进入抽奖</span>
         </button>
@@ -34,9 +36,17 @@
             <span class="state">Loading...</span>
             <span class="name">开始抽奖</span>
         </button>
+        <button class="button" id="quit_lottery" style="display: none">
+            <span class="state">Loading...</span>
+            <span class="name">退出抽奖</span>
+        </button>
         <button class="button stop_lottery" id="stop_lottery" style="display: none">
             <span class="state">Loading...</span>
             <span class="name">停止抽奖</span>
+        </button>
+        <button class="button" id="confirm_lottery" style="display: none">
+            <span class="state">Loading...</span>
+            <span class="name">确定抽奖</span>
         </button>
     </div>
 </div>

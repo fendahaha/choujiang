@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+            integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .box {
+            width: 100px;
+            height: 150px;
+            position: relative;
+            /*border: 1px solid black;*/
+            /*background-color: #4CAF50;*/
+            transform-style: preserve-3d;
+            transform-origin: center center 0;
+            transform: translate3d(0, 0, -2000px) rotateX(-0deg) rotateY(0deg);
+            /*transform: scale(0.3) rotateX(-0deg);*/
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: rgba(0, 127, 127, 0.282);
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.75);
+            border: 1px solid rgba(127, 255, 255, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+            transform-origin: center center -800px;
+            /*backface-visibility: hidden;*/
+        }
+
+        .buttons {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            bottom: 10px;
+            text-align: center;
+        }
+
+        .buttons button {
+            margin: 0 10px;
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <!--    <div class="card card-20">20</div>-->
+</div>
+<div class="buttons">
+    <button id="start">start</button>
+    <button id="stop">stop</button>
+</div>
+<script>
+    const generate_cards = (n) => {
+        let data = [...Array(10).keys()].map(i => i + 10 * n);
+        let cards = data.map(i => `<div class="card card-${i}">${i}</div>`).join('');
+        $(".box").append(cards);
+        let degs = [0, 30, 60, 120, 150, 180, 210, 240, 300, 330]
+        data.forEach((i, index) => {
+            $(`.card.card-${i}`).css('transform', `translate3d(0,0,800px) rotateY(${n * 30}deg) rotateX(${degs[index]}deg)`)
+        })
+    }
+
+    [...Array(12).keys()].forEach(n => {
+        generate_cards(n);
+    })
+
+    const keyframes = [
+        {transform: `translate3d(0, 0, -2000px) rotateX(-0deg) rotateY(${10000 * 360}deg)`, offset: 1},
+    ];
+    const options = {fill: "forwards", easing: "linear", duration: 10000 * 10000, iterations: 1,};
+    const animation = $(".box")[0].animate(keyframes, options);
+
+
+    $("#start").on('click', () => {
+        animation.play()
+    })
+    $("#stop").on('click', () => {
+        animation.pause()
+    })
+</script>
+</body>
+</html>
