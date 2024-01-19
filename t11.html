@@ -1,64 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Sphere Simulation</title>
-    <style>
-        .sphere-container {
-            perspective: 500px;
-            width: 300px;
-            height: 300px;
-            position: relative;
-            margin: 50px auto;
-        }
-        .sphere-element {
-            width: 50px;
-            height: 50px;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform-style: preserve-3d;
-            transform: translate(-50%, -50%);
-            transition: transform 1s;
-        }
-        .sphere-face {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: cyan;
-            opacity: 0.8;
-            border: 1px solid #FFF;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+          integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/t11.css">
 </head>
 <body>
-
-<div class="sphere-container">
-    <!-- Elements will be added by JavaScript -->
+<div class="main">
+  <div class="cj-container">
+    <div class="cj-container-show-persons">
+      <div class="cj-choose" id="cj-choose" style="display: none"></div>
+      <div class="cj-person" id="p-0">
+        <div class="cj-person-back"></div>
+        <div class="cj-person-front">
+          <div class="cj-person-front-1">LG</div>
+          <div class="cj-person-front-2">0</div>
+          <div class="cj-person-front-3">251900006</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="buttons">
+    <button class="button" id="loading" style="display: none">
+      <span class="name">Loading...</span>
+    </button>
+    <button class="button" id="go_to_lottery" style="display: none">
+      <span class="state">Loading...</span>
+      <span class="name">进入抽奖</span>
+    </button>
+    <button class="button" id="start_lottery" style="display: none">
+      <span class="state">Loading...</span>
+      <span class="name">开始抽奖</span>
+    </button>
+    <button class="button" id="quit_lottery" style="display: none">
+      <span class="state">Loading...</span>
+      <span class="name">退出抽奖</span>
+    </button>
+    <button class="button stop_lottery" id="stop_lottery" style="display: none">
+      <span class="state">Loading...</span>
+      <span class="name">停止抽奖</span>
+    </button>
+    <button class="button" id="confirm_lottery" style="display: none">
+      <span class="state">Loading...</span>
+      <span class="name">确定抽奖</span>
+    </button>
+  </div>
 </div>
-
-<script>
-    const sphereContainer = document.querySelector('.sphere-container');
-    const numberOfElements = 30; // Number of elements to distribute on the sphere
-    const radius = 100; // Adjust if needed
-
-    for (let i = 0; i < numberOfElements; i++) {
-        const theta = Math.random() * 2 * Math.PI;
-        const phi = Math.acos((Math.random() * 2) - 1);
-        const x = radius * Math.sin(phi) * Math.cos(theta);
-        const y = radius * Math.sin(phi) * Math.sin(theta);
-        const z = radius * Math.cos(phi);
-
-        const element = document.createElement('div');
-        element.className = 'sphere-element';
-        element.style.transform = `translate3D(${x}px, ${y}px, ${z}px)`;
-        const face = document.createElement('div');
-        face.className = 'sphere-face';
-        element.appendChild(face);
-        sphereContainer.appendChild(element);
-    }
-</script>
-
+<script src="/js/t11.js"/>
 </body>
 </html>

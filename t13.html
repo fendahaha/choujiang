@@ -97,7 +97,7 @@
         {transform: `translate3d(0, 0, -2000px) rotateX(-0deg) rotateY(${10000 * 360}deg)`, offset: 1},
     ];
     const options = {fill: "forwards", easing: "linear", duration: 10000 * 10000, iterations: 1,};
-    // const animation = $(".box")[0].animate(keyframes, options);
+    const animation = $(".box")[0].animate(keyframes, options);
     $("#start").on('click', () => {
         animation.play()
     })
@@ -107,16 +107,10 @@
 
     $("#set").on('click', () => {
         const keyframes = [
-            {transform: `translate3d(0, 0, 0px) rotateX(0deg) rotateY(${0}deg) scale(5)`, offset: 1},
+            {transform: `translate3d(0, 0, 1800px) rotateY(0deg) rotateX(0deg) scale(5)`, offset: 1},
         ];
         const options = {fill: "forwards", easing: "linear", duration: 2000, iterations: 1,};
-        $(".card.card-9")[0].animate(keyframes, options).finished.then(() => {
-            const keyframes = [
-                {transform: `translate3d(0, 0, 800px) rotateY(${0}deg) rotateX(${330}deg) scale(1)`, offset: 1},
-            ];
-            const options = {fill: "forwards", easing: "linear", duration: 2000, iterations: 1,};
-            $(".card.card-9")[0].animate(keyframes, options)
-        })
+        $(".card.card-9")[0].animate(keyframes, options)
     })
 </script>
 </body>
