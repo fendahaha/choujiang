@@ -22,268 +22,6 @@ const prize_util = {
     }
 }
 /**############################*/
-console.log(window.innerWidth, window.innerHeight);
-let rate = window.innerWidth * 0.6 / (17 * 100 + 16 * 20)
-$(".cj-container-show-persons").css('transform', `scale(${rate})`)
-const bcr = $(".cj-container-show-persons")[0].getBoundingClientRect();
-const center_point = {x: bcr.x + bcr.width / 2, y: bcr.y + bcr.height / 2}
-/**############################*/
-const persons = [...Array(130).keys()].map(e => {
-    return {
-        id: `p-${e}`,
-        name: `p-${e}`,
-        employeeId: '251900006',
-        department: '研发',
-        style: `background-color: rgba(0, 127, 127, ${(Math.random() * 6 + 2) / 10});`
-    }
-});
-const persons_show = persons.slice(0, 17 * 7);
-const persons_hide = persons.slice(17 * 7);
-/**###############################*/
-const person_manager = {
-    create_person: (e, hide = false) => {
-        return `<div class="cj-person ${hide ? 'hide' : ''}" id="${e.id}">
-            <div class="cj-person-front" style="${e.style}">
-                <div class="cj-person-front-1">LG</div>
-                <div class="cj-person-front-2">${e.name}</div>
-                <div class="cj-person-front-3">${e.employeeId}</div>
-            </div>
-            <div class="cj-person-back"></div>
-        </div>`
-    },
-    update_person: function (p_id, data) {
-        $(`#${p_id}`).find(".cj-person-front-2").text(data.name);
-        $(`#${p_id}`).find(".cj-person-front-3").text(data.employeeId);
-        $(`#${p_id}`).attr('id', data.id);
-    },
-    render_show_person: function () {
-        const persons_html = persons_show.map(e => person_manager.create_person(e)).join('');
-        $(".cj-container-show-persons .cj-person").remove();
-        $(".cj-container-show-persons").append(persons_html);
-    },
-    render_hide_person: function () {
-        const persons_html = persons_hide.map(e => person_manager.create_person(e)).join('');
-        $(".cj-container-hidden-persons .cj-person").remove();
-        $(".cj-container-hidden-persons").append(persons_html);
-    },
-    render_person: function () {
-        this.render_show_person();
-        // this.render_hide_person();
-    }
-}
-const random_place_person = {
-    random_place_person_animations: [],
-    random_place_person_animations_finished: true,
-    choose_random_point: () => {
-        let w = Math.floor(Math.random() * (window.innerWidth - 100));
-        let h = Math.floor(Math.random() * (window.innerHeight - 140));
-        return {left: w, top: h}
-    },
-    start: function () {
-        if (this.random_place_person_animations_finished) {
-            this.random_place_person_animations_finished = false;
-            persons_show.forEach(e => {
-                let $target = $(`#${e.id}`);
-                const bcr = $target[0].getBoundingClientRect();
-                const point = this.choose_random_point();
-                let x = (point.left - bcr.left) * 1.9;
-                let y = (point.top - bcr.top) * 1.9;
-                let z = Math.floor(Math.random() * 500) - 250;
-
-                let target = $(`#${e.id}`)[0];
-                const keyframes = [
-                    {transform: `translate3d(${x}px, ${y}px, ${z}px) rotateY(0deg)`, offset: 0},
-                    {transform: 'translate3d(0,0,0) rotateY(360deg)', offset: 1},
-                ];
-                const options = {
-                    fill: "forwards",
-                    // easing: "steps(4, end)",
-                    easing: "ease-in",
-                    duration: (Math.random() + 2) * 1000,
-                    iterations: 1,
-                };
-                const animate = target.animate(keyframes, options);
-                this.random_place_person_animations.push(animate);
-            })
-            const _this = this;
-            Promise.all(
-                this.random_place_person_animations.map((animation) => animation.finished),
-            ).then(() => {
-                _this.random_place_person_animations.forEach(a => {
-                    // a.commitStyles();
-                    a.cancel();
-                })
-                _this.random_place_person_animations = [];
-                _this.random_place_person_animations_finished = true;
-            });
-            return this
-        }
-    },
-    finished: function () {
-        return Promise.all(
-            this.random_place_person_animations.map((animation) => animation.finished),
-        )
-    }
-}
-const updating_manager = {
-    last_update_animation: null,
-    updating_interval_id: null,
-    is_updating: false,
-    loading: false,
-    update: function () {
-        let hide_index = Math.floor(Math.random() * persons_hide.length);
-        let show_index = Math.floor(Math.random() * persons_show.length);
-        let temp = persons_show[show_index];
-        persons_show[show_index] = persons_hide[hide_index];
-        persons_hide[hide_index] = temp;
-        person_manager.update_person(persons_hide[hide_index].id, persons_show[show_index])
-
-        const target = $(`#${persons_show[show_index].id} .cj-person-front`)[0];
-        const keyframes = [
-            {backgroundColor: `yellow`, offset: 0},
-            {backgroundColor: `rgba(0, 127, 127, ${(Math.random() * 6 + 2) / 10})`, offset: 1},
-        ];
-        const options = {
-            fill: "forwards",
-            duration: 1000,
-            iterations: 1,
-        };
-        const animation = target.animate(keyframes, options)
-        animation.persist();
-        this.last_update_animation = animation;
-    },
-    start_updating: function () {
-        if (!this.loading) {
-            this.loading = true;
-            if (this.is_updating) {
-                this.loading = false;
-                return
-            }
-            this.is_updating = true;
-            console.log('start');
-            const _this = this;
-            this.updating_interval_id = setInterval(() => {
-                _this.update();
-            }, 100);
-            this.loading = false;
-        }
-    },
-    stop_updating: function () {
-        if (!this.loading) {
-            this.loading = true;
-            if (!this.is_updating) {
-                this.loading = false;
-                return Promise.resolve(undefined)
-            }
-            console.log('stop');
-            clearInterval(this.updating_interval_id);
-            const _this = this;
-            return this.last_update_animation.finished.then(() => {
-                _this.is_updating = false;
-                _this.loading = false;
-            })
-        }
-        return Promise.resolve(undefined)
-    }
-}
-person_manager.render_person();
-random_place_person.start().finished().then(() => {
-    updating_manager.start_updating();
-    $("#go_to_lottery").show();
-});
-// $("#go_to_lottery").show();
-/**#############################*/
-const choose_manager = {
-    choose_data: {current: null},
-    last_animation: null,
-    choose_intervalId: null,
-    is_choosing: false,
-    loading: false,
-    getOffsets: (_c) => {
-        let c = document.getElementById(_c);
-        return {left: c.offsetLeft, top: c.offsetTop}
-    },
-    choose_next: function () {
-        const n = Math.floor(Math.random() * persons_show.length);
-        this.choose_data.current = persons_show[n];
-        const offsets = this.getOffsets(persons_show[n].id);
-        const keyframes = [
-            {left: offsets.left + 'px', top: offsets.top + 'px'},
-        ];
-        const options = {
-            fill: "forwards",
-            easing: "ease-in",
-            duration: 100,
-            iterations: 1,
-        };
-        const animation = $("#cj-choose")[0].animate(keyframes, options);
-        this.last_animation = animation;
-        animation.persist();
-    },
-    start_choose: function () {
-        if (!this.loading) {
-            this.loading = true;
-            if (this.is_choosing) {
-                this.loading = false;
-                return
-            }
-            $("#cj-choose").show();
-            const _this = this;
-            this.choose_intervalId = setInterval(() => _this.choose_next(), 100);
-            this.is_choosing = true;
-            this.loading = false;
-        }
-    },
-    stop_choose: function () {
-        if (!this.loading) {
-            this.loading = true;
-            if (!this.is_choosing) {
-                this.loading = false;
-                return Promise.resolve(undefined)
-            }
-            clearInterval(this.choose_intervalId);
-            const _this = this;
-            return this.last_animation.finished.then(() => {
-                return _this.show_choose_target().then(() => {
-                    _this.is_choosing = false;
-                    _this.loading = false;
-                })
-            })
-        } else {
-            return Promise.resolve(undefined)
-        }
-    },
-    show_choose_target: function () {
-        return new Promise(function (resolve, reject) {
-            setTimeout(() => {
-                resolve(true)
-            }, 400)
-        }).then(() => {
-            $("#cj-choose").hide();
-            const $target = $(`#${choose_manager.choose_data.current.id}`);
-            $target.css('z-index', '1');
-            const bcr = $target[0].getBoundingClientRect();
-            const point = {x: bcr.x + bcr.width / 2, y: bcr.y + bcr.height / 2}
-            let x = (center_point.x - point.x) / rate;
-            let y = (center_point.y - point.y) / rate;
-            const keyframes = [{transform: `translate3d(${x}px, ${y}px, 800px) rotateY(0deg)`}];
-            const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
-            const animate = $target[0].animate(keyframes, options);
-            return animate.finished.then((a) => a.commitStyles())
-        })
-    },
-    hide_choose_target: function () {
-        const $target = $(`#${this.choose_data.current.id}`);
-        const keyframes = [{transform: `translate3d(0px, 0px, 0px) rotateY(180deg)`}];
-        const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
-        const animate = $target[0].animate(keyframes, options);
-        return animate.finished.then((a) => {
-            a.commitStyles();
-            $target.css('z-index', '0');
-        })
-    },
-}
-/**###############################*/
 const buttons_manager = {
     hideAll: () => {
         $(".buttons > button").hide()
@@ -296,104 +34,178 @@ const buttons_manager = {
         ids.forEach(e => $(`#${e}`).show())
     }
 }
-
-let loading = false;
-$("#go_to_lottery").on('click', () => {
-    if (!loading) {
-        loading = true;
-        buttons_manager.show('loading')
-        updating_manager.stop_updating().then(() => {
-            $(".cj-container-show-persons .cj-person-back").css('opacity', '1');
-            $(".cj-container-show-persons .cj-person-front").css('backface-visibility', 'hidden');
-            const animations = persons_show.map(e => {
-                const keyframes = [{transform: 'translate3d(0, 0, 0) rotateY(180deg)'}];
-                const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
-                const animate = $(`#${e.id}`)[0].animate(keyframes, options);
+/**############################*/
+const cards = [...Array(119).keys()];
+const cards_html = cards.map((i) => {
+    return `<div class="card" id="card-${i}">
+                <div class="card-back"></div>
+                <div class="card-front">
+                    <div class="card-front-1">LG</div>
+                    <div class="card-front-2">${i}</div>
+                    <div class="card-front-3">251900006</div>
+                </div>
+            </div>`
+}).join('');
+$(".cards .card").remove();
+$(".cards").append(cards_html);
+/**############################*/
+const rectangular_matrix = {
+    get_card_translate_xy: (index) => {
+        let xn = (index % 17 - 8) * (100 + 20);
+        let yn = (Math.floor(index / 17) - 3) * (126 + 20);
+        return {xn, yn}
+    },
+    get_card_translate3D: function (index) {
+        const {xn, yn} = this.get_card_translate_xy(index);
+        return `translate3d(${xn}px, ${yn}px, 0)`
+    },
+    do: function () {
+        cards.forEach(i => {
+            const {xn, yn} = rectangular_matrix.get_card_translate_xy(i);
+            $("#card-" + i).css('transform', `translate3d(${xn}px, ${yn}px, 0) rotateY(0deg)`)
+        })
+    }
+}
+const random_place_animation_manager = {
+    loading: false,
+    animations: [],
+    random_point_around_container: () => {
+        const rate = 2;
+        let w = Math.floor(Math.random() * window.innerWidth) - window.innerWidth / 2;
+        let h = Math.floor(Math.random() * window.innerHeight) - window.innerHeight / 2;
+        return {x: w * rate, y: h * rate}
+    },
+    do: function () {
+        const _this = this;
+        if (!this.loading) {
+            this.loading = true;
+            const _animations = cards.map(i => {
+                const translate3D = rectangular_matrix.get_card_translate3D(i);
+                const {x, y} = _this.random_point_around_container();
+                const z = Math.floor(Math.random() * 500) - 250;
+                const target = $("#card-" + i)[0];
+                const keyframes = [
+                    {transform: `translate3d(${x}px, ${y}px, ${z}px) rotateY(360deg)`, offset: 0},
+                    {transform: `${translate3D} rotateY(0deg)`, offset: 1},
+                ];
+                const options = {
+                    fill: "forwards",
+                    easing: "ease-in",
+                    duration: (Math.random() + 1) * 1000,
+                    iterations: 1,
+                };
+                const animate = target.animate(keyframes, options);
+                return animate.finished
+            })
+            this.animations = _animations
+            return Promise.all(_animations).then(() => {
+                this.loading = false;
+            })
+        }
+    },
+    finished: function () {
+        return Promise.all(this.animations)
+    },
+}
+const card_flip_animation = {
+    loading: false,
+    animations: [],
+    flip_back: function () {
+        const _this = this;
+        if (!this.loading) {
+            this.loading = true;
+            $(".cards .card").addClass('two-face');
+            const animations = cards.map(i => {
+                const translate3D = rectangular_matrix.get_card_translate3D(i);
+                const keyframes = [{transform: `${translate3D} rotateY(180deg)`}];
+                const options = {fill: "forwards", easing: "ease-in", duration: 500, iterations: 1,};
+                const animate = $(`#card-${i}`)[0].animate(keyframes, options);
                 return animate.finished.then((a) => {
                     a.commitStyles()
                 })
             })
-            Promise.all(animations).then(() => {
-                loading = false;
-                buttons_manager.show('start_lottery', 'quit_lottery')
+            this.animations = animations;
+            return Promise.all(animations).then(() => {
+                _this.loading = false;
             })
-        })
+        }
+    },
+    flip_front: function () {
+        const _this = this;
+        if (!this.loading) {
+            this.loading = true;
+            const animations = cards.map(i => {
+                const translate3D = rectangular_matrix.get_card_translate3D(i);
+                const keyframes = [{transform: `${translate3D} rotateY(0deg)`}];
+                const options = {fill: "forwards", easing: "ease-in", duration: 500, iterations: 1,};
+                const animate = $(`#card-${i}`)[0].animate(keyframes, options);
+                return animate.finished.then((a) => {
+                    a.commitStyles()
+                })
+            })
+            this.animations = animations;
+            return Promise.all(animations).then(() => {
+                $(".cards .card").removeClass('two-face');
+                _this.loading = false;
+            })
+        }
+    },
+    finished: function () {
+        return Promise.all(this.animations)
     }
+}
+
+// rectangular_matrix.do();
+// random_place_animation_manager.do()
+
+$(".cards .card").css('transform-origin', 'center center -800px')
+let rotateXY_list = [];
+[...Array(24).keys()].forEach(i => {
+    let y = i * 15;
+    let x_arr = [...Array(6).keys()].map((i) => i + 1).map((i) => 90 - 25.7 * i)
+    if (i % 2 === 1) {
+        x_arr.shift()
+        x_arr.pop()
+    }
+    let xy = x_arr.map(x => {
+        return {x: x, y: y}
+    })
+    rotateXY_list.push(...xy)
+})
+
+console.log(rotateXY_list);
+cards.forEach((i, index) => {
+    let xy = rotateXY_list[index]
+    $(`#card-${i}`).css('transform', `translate3d(0, 0, 800px) rotateY(${xy.y}deg) rotateX(${xy.x}deg)`)
+})
+
+$("#loading").on('click', () => {
+    const keyframes = [
+        {transform: `translate3d(0, 0, 800px) rotateY(${0}deg) rotateX(${0}deg)`, offset: 1},
+    ];
+    const options = {fill: "forwards", easing: "ease-in", duration: 1000, iterations: 1};
+    const animate = $(`#card-${40}`)[0].animate(keyframes, options);
+});
+$("#go_to_lottery").on('click', () => {
+    const keyframes = [
+        {transform: `translate3d(0, 0, -1750px) rotateY(360deg)`, offset: 0},
+        {transform: `translate3d(0, 0, -1750px) rotateY(0deg)`, offset: 1},
+    ];
+    const options = {fill: "forwards", easing: "ease-in", duration: 3000, iterations: 1};
+    const animate = $(`.cards`)[0].animate(keyframes, options);
+});
+$("#start_lottery").on('click', () => {
+    card_flip_animation.flip_front()
 });
 $("#quit_lottery").on('click', () => {
-    if (!loading) {
-        loading = true;
-        buttons_manager.show('loading');
-        const animations = persons_show.map(e => {
-            const keyframes = [{transform: 'translate3d(0, 0, 0) rotateY(0deg)'}];
-            const options = {fill: "forwards", easing: "ease-in", duration: 800, iterations: 1,};
-            const animate = $(`#${e.id}`)[0].animate(keyframes, options);
-            return animate.finished.then((a) => {
-                a.commitStyles()
-            })
-        })
-        Promise.all(animations).then(() => {
-            $(".cj-container-show-persons .cj-person-back").css('opacity', '0');
-            $(".cj-container-show-persons .cj-person-front").css('backface-visibility', 'visible');
-            updating_manager.start_updating()
-            buttons_manager.show('go_to_lottery');
-            loading = false;
-        })
-    }
-})
 
-let is_lottery = false;
-$("#start_lottery").on('click', () => {
-    if (!loading) {
-        loading = true;
-        buttons_manager.show('loading')
-        if (!is_lottery) {
-            choose_manager.start_choose()
-            is_lottery = true;
-            buttons_manager.show('stop_lottery')
-            loading = false;
-        } else {
-            buttons_manager.show('stop_lottery')
-            loading = false;
-        }
-    }
-})
-let is_confirm_lottery = false;
+});
 $("#stop_lottery").on('click', () => {
-    const action_ended = () => {
-        is_lottery = false;
-        is_confirm_lottery = true;
-        buttons_manager.show('confirm_lottery')
-        loading = false;
-    }
-    if (!loading) {
-        loading = true;
-        buttons_manager.show('loading')
-        if (!is_lottery) {
-            action_ended()
-        }
-        choose_manager.stop_choose().then(() => {
-            action_ended()
-        })
-    }
-})
-
+});
 $("#confirm_lottery").on('click', () => {
-    const action_ended = () => {
-        choose_manager.hide_choose_target().then(() => {
-            is_confirm_lottery = false
-            buttons_manager.show('start_lottery', 'quit_lottery')
-            loading = false;
-        })
-    }
-    if (!loading) {
-        loading = true;
-        buttons_manager.show('loading')
-        if (!is_confirm_lottery) {
-            action_ended()
-            return
-        }
-        action_ended()
-    }
-})
+});
+/**############################*/
+/**############################*/
+/**############################*/
+/**############################*/
 
