@@ -52,6 +52,30 @@ const cards_html = cards.map((i) => {
 $(".cards .card").remove();
 $(".cards").append(cards_html);
 /**############################*/
+const persons = [...Array(130).keys()].map(e => {
+    return {
+        id: `p-${e}`,
+        name: `p-${e}`,
+        employeeId: '251900006',
+        department: '研发',
+        style: `background-color: rgba(0, 127, 127, ${(Math.random() * 6 + 2) / 10});`
+    }
+});
+const persons_show = persons.slice(0, cards.length + 1);
+const persons_hide = persons.slice(cards.length + 1);
+const person_manager = {
+    upload: function () {
+        persons_show.forEach((person, index) => {
+            const $target = $(`#card-${index}`);
+            $target.attr('person-id', person.id);
+            $target.find('.card-front-2').text(person.name)
+        })
+    },
+    update: function (p_id, data) {
+    },
+}
+person_manager.update();
+/**############################*/
 const rectangular_animation = {
     get_card_translate_xy: (index) => {
         let xn = (index % 17 - 8) * (100 + 20);
