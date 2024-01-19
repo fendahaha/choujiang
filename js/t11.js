@@ -32,6 +32,9 @@ const buttons_manager = {
     show: function (...ids) {
         this.hideAll();
         ids.forEach(e => $(`#${e}`).show())
+    },
+    show_loading: function () {
+        this.show('loading')
     }
 }
 /**############################*/
@@ -49,44 +52,118 @@ const cards_html = cards.map((i) => {
 $(".cards .card").remove();
 $(".cards").append(cards_html);
 /**############################*/
-const rectangular_matrix = {
+const rectangular_animation = {
     get_card_translate_xy: (index) => {
         let xn = (index % 17 - 8) * (100 + 20);
         let yn = (Math.floor(index / 17) - 3) * (126 + 20);
         return {xn, yn}
     },
-    get_card_translate3D: function (index) {
+    get_card_transform: function (index) {
         const {xn, yn} = this.get_card_translate_xy(index);
-        return `translate3d(${xn}px, ${yn}px, 0)`
+        const translate = `translate3d(${xn}px, ${yn}px, 0)`;
+        const rotate = 'rotateY(0deg) rotateX(0deg)';
+        return {translate, rotate}
     },
-    do: function () {
+    do_no_animate: function () {
+        const _this = this;
         cards.forEach(i => {
-            const {xn, yn} = rectangular_matrix.get_card_translate_xy(i);
-            $("#card-" + i).css('transform', `translate3d(${xn}px, ${yn}px, 0) rotateY(0deg)`)
+            const {translate, rotate} = _this.get_card_transform(i);
+            $("#card-" + i).css('transform', `${translate} ${rotate}`);
         })
+    },
+    do: function (options = {fill: "forwards", easing: "ease-in-out", duration: 1000, iterations: 1}) {
+        const _this = this;
+        const animations = cards.map((i, index) => {
+            const {translate, rotate} = _this.get_card_transform(i)
+            const keyframes = [{transform: `${translate} ${rotate}`, offset: 1}];
+            return $(`#card-${i}`)[0].animate(keyframes, options)
+        });
+        return Promise.all(animations.map(a => a.finished))
     }
 }
-const random_place_animation_manager = {
+const ball_shape_animation = {
+    loading: false,
+    finished: null,
+    options: {fill: "forwards", easing: "ease-in-out", duration: 1000, iterations: 1},
+    generate_rotateXY_list: function () {
+        let rotateXY_list = [];
+        [...Array(24).keys()].forEach(i => {
+            const n = 8;
+            const angle = 180 / (n + 1);
+            let y = i * 15;
+            let x_arr = [...Array(n).keys()].map((i) => i + 1).map((i) => 90 - angle * i)
+            x_arr.shift()
+            x_arr.pop()
+            if (i % 2 === 1) {
+                x_arr.shift()
+                x_arr.pop()
+            }
+            let xy = x_arr.map(x => {
+                return {x: x, y: y}
+            })
+            rotateXY_list.push(...xy)
+        })
+        return rotateXY_list
+    },
+    to_ball: function () {
+        const _this = this;
+        if (!this.loading) {
+            this.loading = true;
+            cards_container_animation.far();
+            const rotateXY_list = this.generate_rotateXY_list();
+            const circle_radius = 800;
+            $(".cards .card").css('transform-origin', `center center -${circle_radius}px`);
+            const animations = cards.map((i, index) => {
+                let {x, y} = rotateXY_list[index];
+                const transform = `translate3d(0, 0, ${circle_radius}px) rotateY(${y}deg) rotateX(${x}deg)`;
+                const keyframes = [{transform: transform, offset: 1}];
+                return $(`#card-${i}`)[0].animate(keyframes, _this.options)
+            });
+            this.finished = Promise.all(animations.map(a => a.finished)).then(() => {
+                this.loading = false
+            })
+            return this
+        }
+    },
+    to_rectangular: function () {
+        if (!this.loading) {
+            this.loading = true;
+            cards_container_animation.near();
+            this.finished = rectangular_animation.do(this.options).then(() => {
+                $(".cards .card").css('transform-origin', `center center ${0}px`);
+                this.loading = false;
+            })
+            return this
+        }
+    }
+}
+const random_place_animation = {
     loading: false,
     animations: [],
+    finished: null,
     random_point_around_container: () => {
         const rate = 2;
         let w = Math.floor(Math.random() * window.innerWidth) - window.innerWidth / 2;
         let h = Math.floor(Math.random() * window.innerHeight) - window.innerHeight / 2;
         return {x: w * rate, y: h * rate}
     },
+    random_transform: function () {
+        const {x, y} = this.random_point_around_container();
+        const z = Math.floor(Math.random() * 500) - 250;
+        const translate = `translate3d(${x}px, ${y}px, ${z}px)`;
+        const rotate = 'rotateY(360deg) rotateX(0deg)';
+        return {translate, rotate}
+    },
     do: function () {
         const _this = this;
         if (!this.loading) {
             this.loading = true;
-            const _animations = cards.map(i => {
-                const translate3D = rectangular_matrix.get_card_translate3D(i);
-                const {x, y} = _this.random_point_around_container();
-                const z = Math.floor(Math.random() * 500) - 250;
-                const target = $("#card-" + i)[0];
+            const animations = cards.map(i => {
+                const card_transform = rectangular_animation.get_card_transform(i);
+                const {translate, rotate} = _this.random_transform();
                 const keyframes = [
-                    {transform: `translate3d(${x}px, ${y}px, ${z}px) rotateY(360deg)`, offset: 0},
-                    {transform: `${translate3D} rotateY(0deg)`, offset: 1},
+                    {transform: `${translate} ${rotate}`, offset: 0},
+                    {transform: `${card_transform.translate} ${card_transform.rotate}`, offset: 1},
                 ];
                 const options = {
                     fill: "forwards",
@@ -94,38 +171,35 @@ const random_place_animation_manager = {
                     duration: (Math.random() + 1) * 1000,
                     iterations: 1,
                 };
-                const animate = target.animate(keyframes, options);
-                return animate.finished
+                return $("#card-" + i)[0].animate(keyframes, options)
             })
-            this.animations = _animations
-            return Promise.all(_animations).then(() => {
+            this.animations = animations
+            this.finished = Promise.all(animations.map(a => a.finished)).then(() => {
                 this.loading = false;
             })
         }
-    },
-    finished: function () {
-        return Promise.all(this.animations)
     },
 }
 const card_flip_animation = {
     loading: false,
     animations: [],
+    finished: null,
+    options: {fill: "forwards", easing: "ease-in", duration: 500, iterations: 1,},
     flip_back: function () {
         const _this = this;
         if (!this.loading) {
             this.loading = true;
             $(".cards .card").addClass('two-face');
             const animations = cards.map(i => {
-                const translate3D = rectangular_matrix.get_card_translate3D(i);
-                const keyframes = [{transform: `${translate3D} rotateY(180deg)`}];
-                const options = {fill: "forwards", easing: "ease-in", duration: 500, iterations: 1,};
-                const animate = $(`#card-${i}`)[0].animate(keyframes, options);
+                const {translate, rotate} = rectangular_animation.get_card_transform(i);
+                const keyframes = [{transform: `${translate} rotateY(180deg) rotateX(0deg)`}];
+                const animate = $(`#card-${i}`)[0].animate(keyframes, _this.options);
                 return animate.finished.then((a) => {
                     a.commitStyles()
                 })
             })
             this.animations = animations;
-            return Promise.all(animations).then(() => {
+            this.finished = Promise.all(animations).then(() => {
                 _this.loading = false;
             })
         }
@@ -135,74 +209,126 @@ const card_flip_animation = {
         if (!this.loading) {
             this.loading = true;
             const animations = cards.map(i => {
-                const translate3D = rectangular_matrix.get_card_translate3D(i);
-                const keyframes = [{transform: `${translate3D} rotateY(0deg)`}];
-                const options = {fill: "forwards", easing: "ease-in", duration: 500, iterations: 1,};
-                const animate = $(`#card-${i}`)[0].animate(keyframes, options);
+                const {translate, rotate} = rectangular_animation.get_card_transform(i);
+                const keyframes = [{transform: `${translate} rotateY(0deg) rotateX(0deg)`}];
+                const animate = $(`#card-${i}`)[0].animate(keyframes, _this.options);
                 return animate.finished.then((a) => {
                     a.commitStyles()
                 })
             })
             this.animations = animations;
-            return Promise.all(animations).then(() => {
+            this.finished = Promise.all(animations).then(() => {
                 $(".cards .card").removeClass('two-face');
                 _this.loading = false;
             })
         }
+    }
+}
+const cards_container_animation = {
+    options: {fill: "forwards", easing: "ease-in", duration: 300, iterations: 1},
+    far: function () {
+        const keyframes = [
+            {transform: `translate3d(0, 0, -1550px) rotateY(0deg) rotateX(0deg)`, offset: 1},
+        ];
+        return $('.cards')[0].animate(keyframes, this.options).finished.then((a) => {
+            a.commitStyles();
+        })
     },
-    finished: function () {
-        return Promise.all(this.animations)
+    near: function () {
+        const keyframes = [
+            {transform: `translate3d(0, 0, -750px) rotateY(0deg) rotateX(0deg)`, offset: 1},
+        ];
+        return $('.cards')[0].animate(keyframes, this.options).finished.then((a) => {
+            a.commitStyles();
+        })
+    },
+    animation: null,
+    rotate: function (n = 1) {
+        const keyframes = [
+            {transform: `translate3d(0, 0, -1550px) rotateY(${-360 * n}deg)`, offset: 0},
+            {transform: `translate3d(0, 0, -1550px) rotateY(0deg)`, offset: 1},
+        ];
+        const options = {fill: "forwards", easing: "linear", duration: n * 1000, iterations: 1};
+        const animation = $(`.cards`)[0].animate(keyframes, options);
+        this.animation = animation;
+        return animation.finished
+    },
+    stop_rotate: function () {
+        this.animation.commitStyles()
+        this.animation.cancel()
+        return Promise.resolve(true);
+        // return this.animation.finished
     }
 }
 
-// rectangular_matrix.do();
-// random_place_animation_manager.do()
-
-$(".cards .card").css('transform-origin', 'center center -800px')
-let rotateXY_list = [];
-[...Array(24).keys()].forEach(i => {
-    let y = i * 15;
-    let x_arr = [...Array(6).keys()].map((i) => i + 1).map((i) => 90 - 25.7 * i)
-    if (i % 2 === 1) {
-        x_arr.shift()
-        x_arr.pop()
-    }
-    let xy = x_arr.map(x => {
-        return {x: x, y: y}
-    })
-    rotateXY_list.push(...xy)
+$(".buttons button").hide()
+rectangular_animation.do_no_animate();
+random_place_animation.do();
+random_place_animation.finished.then(() => {
+    console.log(1);
+    buttons_manager.show('go_to_lottery');
 })
 
-console.log(rotateXY_list);
-cards.forEach((i, index) => {
-    let xy = rotateXY_list[index]
-    $(`#card-${i}`).css('transform', `translate3d(0, 0, 800px) rotateY(${xy.y}deg) rotateX(${xy.x}deg)`)
-})
-
+let loading = false;
 $("#loading").on('click', () => {
-    const keyframes = [
-        {transform: `translate3d(0, 0, 800px) rotateY(${0}deg) rotateX(${0}deg)`, offset: 1},
-    ];
-    const options = {fill: "forwards", easing: "ease-in", duration: 1000, iterations: 1};
-    const animate = $(`#card-${40}`)[0].animate(keyframes, options);
+
 });
 $("#go_to_lottery").on('click', () => {
-    const keyframes = [
-        {transform: `translate3d(0, 0, -1750px) rotateY(360deg)`, offset: 0},
-        {transform: `translate3d(0, 0, -1750px) rotateY(0deg)`, offset: 1},
-    ];
-    const options = {fill: "forwards", easing: "ease-in", duration: 3000, iterations: 1};
-    const animate = $(`.cards`)[0].animate(keyframes, options);
-});
-$("#start_lottery").on('click', () => {
-    card_flip_animation.flip_front()
+    if (!loading) {
+        loading = true;
+        buttons_manager.show_loading();
+        ball_shape_animation.to_ball().finished.then(() => {
+            loading = false;
+            buttons_manager.show('start_lottery', 'quit_lottery')
+        })
+    }
 });
 $("#quit_lottery").on('click', () => {
-
+    if (!loading) {
+        loading = true;
+        buttons_manager.show_loading();
+        ball_shape_animation.to_rectangular().finished.then(() => {
+            loading = false;
+            buttons_manager.show('go_to_lottery');
+        })
+    }
+});
+let is_lottery = false;
+$("#start_lottery").on('click', () => {
+    if (!loading) {
+        loading = true;
+        buttons_manager.show_loading();
+        if (!is_lottery) {
+            is_lottery = true;
+            cards_container_animation.rotate(3600)
+            buttons_manager.show('stop_lottery')
+        }
+        loading = false;
+    }
 });
 $("#stop_lottery").on('click', () => {
+    if (!loading) {
+        loading = true;
+        buttons_manager.show_loading();
+        if (is_lottery) {
+            cards_container_animation.stop_rotate().then(() => {
+                is_lottery = false;
+                buttons_manager.show('confirm_lottery');
+            })
+        }
+        loading = false;
+    }
 });
+
+
 $("#confirm_lottery").on('click', () => {
+    if (!loading) {
+        loading = true;
+        buttons_manager.show_loading();
+
+        buttons_manager.show('start_lottery', 'quit_lottery')
+        loading = false;
+    }
 });
 /**############################*/
 /**############################*/

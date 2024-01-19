@@ -22,9 +22,9 @@
     width: 100px;
     height: 126px;
     position: relative;
-    background-color: antiquewhite;
+    /*background-color: antiquewhite;*/
     transform-style: preserve-3d;
-    transform: translate3d(0, 0, -1750px) rotateY(0deg);
+    transform: translate3d(0, 0, -750px) rotateY(0deg) rotateX(0deg);
 }
 
 /*######################*/
@@ -50,7 +50,7 @@
     top: 0;
     transform-style: preserve-3d;
     transform-origin: center center 0;
-    transform: translate3d(0, 0, 0) rotateY(0deg);
+    transform: translate3d(0, 0, 0) rotateY(0deg) rotateX(0deg);
 }
 
 .card-front {
@@ -70,6 +70,11 @@
     align-items: center;
     justify-content: space-around;
     backface-visibility: visible;
+}
+
+.card-front:hover {
+    box-shadow: 0 0 18px rgba(0, 255, 255, 1);
+    border: 2px solid rgba(127, 255, 255, 1);
 }
 
 .card-back {
