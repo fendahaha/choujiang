@@ -61,20 +61,50 @@ const persons = [...Array(130).keys()].map(e => {
         style: `background-color: rgba(0, 127, 127, ${(Math.random() * 6 + 2) / 10});`
     }
 });
-const persons_show = persons.slice(0, cards.length + 1);
-const persons_hide = persons.slice(cards.length + 1);
+const persons_show = persons.slice(0, cards.length);
+const persons_hide = persons.slice(cards.length);
 const person_manager = {
     upload: function () {
+        const _this = this;
         persons_show.forEach((person, index) => {
-            const $target = $(`#card-${index}`);
-            $target.attr('person-id', person.id);
-            $target.find('.card-front-2').text(person.name)
+            _this.update(index, person)
         })
     },
-    update: function (p_id, data) {
+    update: function (index, person) {
+        const $target = $(`#card-${index}`);
+        $target.attr('person-id', person.id);
+        $target.find('.card-front-1').text(person.department)
+        $target.find('.card-front-2').text(person.name)
+        $target.find('.card-front-3').text(person.employeeId)
     },
+    interval_id: null,
+    last_animation: null,
+    updating: function () {
+        this.interval_id = setInterval(() => {
+            let show_index = Math.floor(Math.random() * persons_show.length);
+            let hide_index = Math.floor(Math.random() * persons_hide.length);
+            this.update(show_index, persons_hide[hide_index]);
+            let temp = persons_show[show_index];
+            persons_show[show_index] = persons_hide[hide_index];
+            persons_hide[hide_index] = temp;
+
+            const keyframes = [
+                {backgroundColor: `yellow`, offset: 0},
+                {backgroundColor: `rgba(0, 127, 127, ${(Math.random() * 6 + 2) / 10})`, offset: 1},
+            ];
+            const options = {fill: "forwards", duration: 1000, iterations: 1};
+            const animation = $(`#card-${show_index}`).find('.card-front')[0].animate(keyframes, options);
+            animation.persist();
+            this.last_animation = animation;
+        }, 100)
+    },
+    stop_updating: function () {
+        clearInterval(this.interval_id);
+        return this.last_animation.finished
+        // return Promise.resolve(undefined)
+    }
 }
-person_manager.update();
+person_manager.upload();
 /**############################*/
 const rectangular_animation = {
     get_card_translate_xy: (index) => {
@@ -269,19 +299,17 @@ const cards_container_animation = {
     animation: null,
     rotate: function (n = 1) {
         const keyframes = [
-            {transform: `translate3d(0, 0, -1550px) rotateY(${-360 * n}deg)`, offset: 0},
-            {transform: `translate3d(0, 0, -1550px) rotateY(0deg)`, offset: 1},
+            {transform: `translate3d(0, 0, -1550px) rotateY(${360 * n}deg)`, offset: 1},
         ];
         const options = {fill: "forwards", easing: "linear", duration: n * 1000, iterations: 1};
         const animation = $(`.cards`)[0].animate(keyframes, options);
         this.animation = animation;
-        return animation.finished
     },
     stop_rotate: function () {
-        this.animation.commitStyles()
-        this.animation.cancel()
+        const animation = this.animation;
+        animation.pause();
+        animation.cancel()
         return Promise.resolve(true);
-        // return this.animation.finished
     }
 }
 
@@ -289,14 +317,11 @@ $(".buttons button").hide()
 rectangular_animation.do_no_animate();
 random_place_animation.do();
 random_place_animation.finished.then(() => {
-    console.log(1);
     buttons_manager.show('go_to_lottery');
+    person_manager.updating();
 })
 
 let loading = false;
-$("#loading").on('click', () => {
-
-});
 $("#go_to_lottery").on('click', () => {
     if (!loading) {
         loading = true;
@@ -324,12 +349,47 @@ $("#start_lottery").on('click', () => {
         buttons_manager.show_loading();
         if (!is_lottery) {
             is_lottery = true;
-            cards_container_animation.rotate(3600)
-            buttons_manager.show('stop_lottery')
+            person_manager.stop_updating().then(() => {
+                cards_container_animation.rotate(3600);
+                buttons_manager.show('stop_lottery');
+            })
         }
         loading = false;
     }
 });
+const person_random_choose = {
+    choose_person: null,
+    random_choose: function () {
+        const index = Math.floor(Math.random() * persons_show.length);
+        this.choose_person = persons_show[index];
+    },
+    animation: null,
+    transform: '',
+    show_choose_person: function () {
+        const $target = $(`[person-id=${this.choose_person.id}]`);
+        console.log($target.css('transform'));
+        this.transform = $target.css('transform');
+        const keyframes = [
+            // {transform: `translate3d(0, 0, ${800}px) rotateY(${0}deg) rotateX(${0}deg)`, offset: 0.7},
+            {transform: `translate3d(0, 0, ${2200}px) rotateY(${0}deg) rotateX(${0}deg)`, offset: 1},
+        ];
+        const options = {fill: "forwards", easing: "ease-out", duration: 1000, iterations: 1};
+        const animation = $target[0].animate(keyframes, options);
+        this.animation = animation;
+        return animation.finished.then(() => {
+            console.log($target.css('transform'));
+        })
+    },
+    not_show_choose_person: function () {
+        const $target = $(`[person-id=${this.choose_person.id}]`);
+        const keyframes = [
+            {transform: this.transform, offset: 1},
+        ];
+        const options = {fill: "forwards", easing: "ease-out", duration: 1000, iterations: 1};
+        const animation = $target[0].animate(keyframes, options);
+        return animation.finished
+    }
+}
 $("#stop_lottery").on('click', () => {
     if (!loading) {
         loading = true;
@@ -337,10 +397,13 @@ $("#stop_lottery").on('click', () => {
         if (is_lottery) {
             cards_container_animation.stop_rotate().then(() => {
                 is_lottery = false;
-                buttons_manager.show('confirm_lottery');
+                person_random_choose.random_choose();
+                person_random_choose.show_choose_person().then(() => {
+                    buttons_manager.show('confirm_lottery');
+                    loading = false;
+                });
             })
         }
-        loading = false;
     }
 });
 
@@ -349,9 +412,11 @@ $("#confirm_lottery").on('click', () => {
     if (!loading) {
         loading = true;
         buttons_manager.show_loading();
-
-        buttons_manager.show('start_lottery', 'quit_lottery')
-        loading = false;
+        person_random_choose.not_show_choose_person().then(() => {
+            person_manager.updating();
+            buttons_manager.show('start_lottery', 'quit_lottery');
+            loading = false;
+        });
     }
 });
 /**############################*/
