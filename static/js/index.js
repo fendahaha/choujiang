@@ -65,7 +65,7 @@ const prize_manager = {
     $prizes_target: $(".prizes"),
     render: function () {
         const html = prizes.map((prize, index) => {
-            const progress = prize.winners.length / prize.total;
+            const progress = (prize.winners.length / prize.total) * 100;
             const rotateX = index * this.per_deg;
             return `<div class="prize" id="prize-${prize.id}" style="transform: rotateX(${rotateX}deg)">
                     <div class="left">
