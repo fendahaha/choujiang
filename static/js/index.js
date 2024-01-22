@@ -1,21 +1,22 @@
-const prizes = [
-    {id: '1', name: '現金20萬', total: 1, winners: []},
-    {id: '2', name: '現金10萬', total: 1, winners: []},
-    {id: '3', name: '現金8萬', total: 1, winners: []},
-    {id: '4', name: 'Macbook air M2 13-inch 512GB', total: 1, winners: []},
-    {id: '5', name: 'iphone 15pro max 256GB', total: 2, winners: []},
-    {id: '6', name: 'iphone 15 256GB', total: 2, winners: []},
-    {id: '7', name: '現金5萬', total: 2, winners: []},
-    {id: '8', name: 'iPad mini 256GB', total: 2, winners: []},
-    {id: '9', name: '現金3萬', total: 2, winners: []},
-    {id: '10', name: '現金2萬', total: 3, winners: []},
-    {id: '11', name: '現金1萬', total: 8, winners: []},
-    {id: '12', name: '現金3萬', total: 2, winners: []},
-    {id: '13', name: 'Airpods Max', total: 1, winners: []},
-    {id: '14', name: 'Apple watch series 9', total: 1, winners: []},
-    {id: '15', name: '現金2萬', total: 5, winners: []},
-    {id: '16', name: '現金1萬', total: 6, winners: []},
-];
+// let prizes = [
+//     {id: '1', name: '現金20萬', total: 1, winners: []},
+//     {id: '2', name: '現金10萬', total: 1, winners: []},
+//     {id: '3', name: '現金8萬', total: 1, winners: []},
+//     {id: '4', name: 'Macbook air M2 13-inch 512GB', total: 1, winners: []},
+//     {id: '5', name: 'iphone 15pro max 256GB', total: 2, winners: []},
+//     {id: '6', name: 'iphone 15 256GB', total: 2, winners: []},
+//     {id: '7', name: '現金5萬', total: 2, winners: []},
+//     {id: '8', name: 'iPad mini 256GB', total: 2, winners: []},
+//     {id: '9', name: '現金3萬', total: 2, winners: []},
+//     {id: '10', name: '現金2萬', total: 3, winners: []},
+//     {id: '11', name: '現金1萬', total: 8, winners: []},
+//     {id: '12', name: '現金3萬', total: 2, winners: []},
+//     {id: '13', name: 'Airpods Max', total: 1, winners: []},
+//     {id: '14', name: 'Apple watch series 9', total: 1, winners: []},
+//     {id: '15', name: '現金2萬', total: 5, winners: []},
+//     {id: '16', name: '現金1萬', total: 6, winners: []},
+// ];
+let prizes = get_prizes();
 prizes.reverse();
 const bcr = $(".prizes-container-content0")[0].getBoundingClientRect();
 const prize_manager = {
@@ -50,9 +51,16 @@ const prize_manager = {
     hit_the_jackpot: function (person) {
         const prize = prizes[this.current_prize_index];
         prize.winners.push(person);
-        const progress = (prize.winners.length / prize.total) * 100;
-        $(`#prize-${prize.id}`).find('.progress').css('width', `${progress}%`);
-        $(`#prize-${prize.id}`).find('.number').text(`${prize.winners.length}/${prize.total}`);
+        if (save_hit_the_jackpot(prizes)) {
+            const progress = (prize.winners.length / prize.total) * 100;
+            $(`#prize-${prize.id}`).find('.progress').css('width', `${progress}%`);
+            $(`#prize-${prize.id}`).find('.number').text(`${prize.winners.length}/${prize.total}`);
+            return true;
+        } else {
+            alert("保存失败，请手动记录一下此中将结果");
+            prize.winners.pop();
+            return false;
+        }
     },
     $prizes_target: $(".prizes"),
     render: function () {
@@ -61,7 +69,7 @@ const prize_manager = {
             const rotateX = index * this.per_deg;
             return `<div class="prize" id="prize-${prize.id}" style="transform: rotateX(${rotateX}deg)">
                     <div class="left">
-                        <img src="http://lottery.xsmng.com/img/mbp.jpg" alt="prize" class="icon"/>
+                        <img src="/static/img/dog.webp" alt="prize" class="icon"/>
                     </div>
                     <div class="right">
                         <div class="name">${prize.name}</div>
@@ -175,15 +183,15 @@ const cards_html = cards.map((i) => {
 }).join('');
 $(".cards").empty().append(cards_html);
 /**############################*/
-let persons = [...Array(130).keys()].map(e => {
-    return {
-        id: `p-${e}`,
-        name: `p-${e}`,
-        employeeId: '251900006',
-        department: '研发',
-    }
-});
-persons = get_persons();
+// let persons = [...Array(130).keys()].map(e => {
+//     return {
+//         id: `p-${e}`,
+//         name: `p-${e}`,
+//         employeeId: '251900006',
+//         department: '研发',
+//     }
+// });
+let persons = get_persons();
 const persons_show = persons.slice(0, cards.length);
 const persons_hide = persons.slice(cards.length);
 const person_manager = {

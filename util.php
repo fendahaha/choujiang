@@ -45,8 +45,7 @@ function test3()
     var_dump(strlen(trim($d)));
 }
 
-//test2();
-function get_prizes()
+function get_prizes_from_xlsx()
 {
     $inputFileType = 'Xlsx';
     $inputFileName = __DIR__ . '/data/prizes.xlsx';
@@ -63,7 +62,7 @@ function get_prizes()
             $prize = [
                 "id" => $i,
                 "name" => trim($v[0]),
-                "total" => trim($v[1]) ?: 0,
+                "total" => intval(trim($v[1])) ?: 0,
                 "winners" => [],
             ];
             array_push($prizes, $prize);
@@ -72,8 +71,7 @@ function get_prizes()
     return $prizes;
 }
 
-
-function get_persons()
+function get_persons_from_xlsx()
 {
     $inputFileType = 'Xlsx';
     $inputFileName = __DIR__ . '/data/users.xlsx';
@@ -99,19 +97,17 @@ function get_persons()
     return $persons;
 }
 
-//var_dump($_SERVER);
-//echo(json_encode($_SERVER['REQUEST_METHOD']));
-//var_dump($_GET['']);
-
-if (!array_key_exists('action', $_GET)) {
-    exit;
-}
-$action = $_REQUEST['action'];
-if ($action === 'prizes') {
-    $prizes = get_prizes();
-    echo(json_encode($prizes));
-} else if ($action === 'persons') {
-    echo(json_encode(get_persons()));
+function get_prizes_json_str()
+{
+    return file_get_contents(__DIR__ . "/temp/prizes.json");
 }
 
-exit;
+function get_persons_json_str()
+{
+    return file_get_contents(__DIR__ . "/temp/persons.json");
+}
+
+function hit_the_jackpot($prizes_json_str)
+{
+    file_put_contents(__DIR__ . "/temp/prizes.json", $prizes_json_str);
+}
