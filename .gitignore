@@ -1,4 +1,5 @@
 .idea/
 vendor/
+temp/
 .htaccess
 nginx.htaccess

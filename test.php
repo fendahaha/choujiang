@@ -104,7 +104,6 @@ function get_persons()
 //var_dump($_GET['']);
 
 if (!array_key_exists('action', $_GET)) {
-    echo("no");
     exit;
 }
 $action = $_REQUEST['action'];
