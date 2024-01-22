@@ -98,3 +98,21 @@ function get_persons()
     }
     return $persons;
 }
+
+//var_dump($_SERVER);
+//echo(json_encode($_SERVER['REQUEST_METHOD']));
+//var_dump($_GET['']);
+
+if (!array_key_exists('action', $_GET)) {
+    echo("no");
+    exit;
+}
+$action = $_REQUEST['action'];
+if ($action === 'prizes') {
+    $prizes = get_prizes();
+    echo(json_encode($prizes));
+} else if ($action === 'persons') {
+    echo(json_encode(get_persons()));
+}
+
+exit;
