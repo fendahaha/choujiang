@@ -29,19 +29,6 @@
 }
 
 /*######################*/
-.cj-choose {
-    z-index: 999;
-    min-width: 0;
-    min-height: 0;
-    display: inline-block;
-    width: 100px;
-    height: 126px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    background-color: #F06705;
-}
-
 .card {
     z-index: 0;
     width: 100px;

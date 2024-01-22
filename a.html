@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<button id="play">play</button>
+<button id="stop">stop</button>
+<script>
+    const audio = new Audio("/media/y2004.wav");
+    audio.loop = true;
+    document.getElementById("play").onclick = function () {
+        audio.play()
+    }
+    document.getElementById("stop").onclick = function () {
+        audio.pause()
+    }
+</script>
+</body>
+</html>
