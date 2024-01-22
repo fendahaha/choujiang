@@ -162,27 +162,28 @@ const prize_manager = {
 }
 /**############################*/
 const cards = [...Array(119).keys()];
+// const cards = [...Array(107).keys()];
 const cards_html = cards.map((i) => {
     return `<div class="card" id="card-${i}">
                 <div class="card-back"></div>
                 <div class="card-front">
                     <div class="card-front-1">LG</div>
                     <div class="card-front-2">${i}</div>
-                    <div class="card-front-3">251900006</div>
+                    <div class="card-front-3">000000000</div>
                 </div>
             </div>`
 }).join('');
 $(".cards").empty().append(cards_html);
 /**############################*/
-const persons = [...Array(130).keys()].map(e => {
+let persons = [...Array(130).keys()].map(e => {
     return {
         id: `p-${e}`,
         name: `p-${e}`,
         employeeId: '251900006',
         department: '研发',
-        style: `background-color: rgba(0, 127, 127, ${(Math.random() * 6 + 2) / 10});`
     }
 });
+persons = get_persons();
 const persons_show = persons.slice(0, cards.length);
 const persons_hide = persons.slice(cards.length);
 const person_manager = {
@@ -194,10 +195,12 @@ const person_manager = {
     },
     update: function (index, person) {
         const $target = $(`#card-${index}`);
-        $target.attr('person-id', person.id);
-        $target.find('.card-front-1').text(person.department)
-        $target.find('.card-front-2').text(person.name)
-        $target.find('.card-front-3').text(person.employeeId)
+        if ($target.length > 0) {
+            $target.attr('person-id', person.id);
+            $target.find('.card-front-1').text(person.department)
+            $target.find('.card-front-2').text(person.name)
+            $target.find('.card-front-3').text(person.employeeId)
+        }
     },
     swap: function (show_index, hide_index) {
         this.update(show_index, persons_hide[hide_index]);
@@ -239,17 +242,19 @@ const person_manager = {
     start_updating: function () {
         if (!this.loading) {
             this.loading = true;
-            if (!this.is_updating) {
-                this.is_updating = true;
-                const _this = this;
-                this.interval_id = setInterval(() => {
-                    let show_index = Math.floor(Math.random() * persons_show.length);
-                    let hide_index = Math.floor(Math.random() * persons_hide.length);
-                    _this.swap(show_index, hide_index);
-                    if (!$(`#card-${show_index}`).hasClass('highlight')) {
-                        _this.do_animate(show_index);
-                    }
-                }, 100);
+            if (persons_hide.length > 0) {
+                if (!this.is_updating) {
+                    this.is_updating = true;
+                    const _this = this;
+                    this.interval_id = setInterval(() => {
+                        let show_index = Math.floor(Math.random() * persons_show.length);
+                        let hide_index = Math.floor(Math.random() * persons_hide.length);
+                        _this.swap(show_index, hide_index);
+                        if (!$(`#card-${show_index}`).hasClass('highlight')) {
+                            _this.do_animate(show_index);
+                        }
+                    }, 100);
+                }
             }
             this.loading = false;
         }
@@ -270,7 +275,7 @@ const person_manager = {
 const person_random_choose = {
     choose_person: null,
     random_choose: function () {
-        const _persons = persons_hide;
+        const _persons = persons;
         const index = Math.floor(Math.random() * _persons.length);
         this.choose_person = _persons[index];
         return this.choose_person
