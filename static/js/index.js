@@ -16,8 +16,6 @@ const cards_render = () => {
 let prizes = get_prizes();
 prizes.reverse();
 let persons = get_persons();
-console.log(prizes);
-console.log(persons);
 /**############################*/
 const bcr = $(".prizes-container-content0")[0].getBoundingClientRect();
 const prize_manager = {
@@ -49,7 +47,6 @@ const prize_manager = {
         return false
     },
     hit_the_jackpot: function (person) {
-        person['hit_the_jackpot'] = true;
         const prize = prizes[this.current_prize_index];
         prize.winners.push(person);
         if (save_hit_the_jackpot(prizes)) {
@@ -182,10 +179,12 @@ const prize_choose_person = {
         this.choose_person = null;
     },
     get_lottery_persons: function () {
-        const prize = prizes[prize_manager.current_prize_index];
-        const level = prize.level;
+        const winners_employeeIds = prizes.reduce((prev, curr) => {
+            return prev.concat(curr.winners)
+        }, []).map(w => w.employeeId);
+        const level = prizes[prize_manager.current_prize_index].level;
         const lottery_persons = persons.filter(p => p.can).filter(p => p.level === level).filter(p => {
-            return !p['hit_the_jackpot'];
+            return !winners_employeeIds.includes(p.employeeId);
         })
         return lottery_persons
     },

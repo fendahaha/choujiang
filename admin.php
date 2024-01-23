@@ -10,9 +10,10 @@ initial();
     <script src="/static/js/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="/static/css/common.css">
     <style>
-        a{
+        a {
             text-decoration: none;
         }
+
         body {
             background-color: black;
         }
@@ -225,7 +226,7 @@ initial();
             loading = true;
             if (confirm("是否重置")) {
                 if (clear_data()) {
-                    alert("已重置数据");
+                    window.location.reload();
                 } else {
                     alert("重置失败");
                 }

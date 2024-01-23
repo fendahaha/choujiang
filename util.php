@@ -93,7 +93,6 @@ function get_persons_from_xlsx()
                 "department" => trim($v[2]),
                 "level" => trim($v[3]),
                 "can" => strtolower(trim($v[4])) == 'yes',
-                "hit_the_jackpot" => false,
             ];
             array_push($persons, $p);
         }
