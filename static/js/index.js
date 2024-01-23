@@ -74,7 +74,7 @@ const prize_manager = {
                         <img src="/static/img/dog.webp" alt="prize" class="icon"/>
                     </div>
                     <div class="right">
-                        <div class="name">${prize.level}&nbsp;${prize.name}</div>
+                        <div class="name">${prize.name}</div>
                         <div class="count">
                             <div class="progress" style="width:${progress}%;"></div>
                             <span class="number">${prize.winners.length}/${prize.total}</span>
