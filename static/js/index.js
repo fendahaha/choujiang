@@ -49,6 +49,7 @@ const prize_manager = {
         return false
     },
     hit_the_jackpot: function (person) {
+        person['hit_the_jackpot'] = true;
         const prize = prizes[this.current_prize_index];
         prize.winners.push(person);
         if (save_hit_the_jackpot(prizes)) {
@@ -58,6 +59,7 @@ const prize_manager = {
             return true;
         } else {
             alert("保存失败，请手动记录一下此中将结果");
+            person['hit_the_jackpot'] = false;
             prize.winners.pop();
             return false;
         }
@@ -72,7 +74,7 @@ const prize_manager = {
                         <img src="/static/img/dog.webp" alt="prize" class="icon"/>
                     </div>
                     <div class="right">
-                        <div class="name">${prize.name}</div>
+                        <div class="name">${prize.level}&nbsp;${prize.name}</div>
                         <div class="count">
                             <div class="progress" style="width:${progress}%;"></div>
                             <span class="number">${prize.winners.length}/${prize.total}</span>
@@ -171,10 +173,18 @@ const prize_manager = {
 const prize_choose_person = {
     choose_person: null,
     random_choose: function () {
-        const _persons = persons;
+        const _persons = this.get_lottery_persons();
         const index = Math.floor(Math.random() * _persons.length);
         this.choose_person = _persons[index];
         return this.choose_person
+    },
+    get_lottery_persons: function () {
+        const prize = prizes[prize_manager.current_prize_index];
+        const level = prize.level;
+        const lottery_persons = persons.filter(p => p.level === level).filter(p => {
+            return !p['hit_the_jackpot'];
+        })
+        return lottery_persons
     },
 }
 /**############################*/

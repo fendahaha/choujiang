@@ -50,11 +50,6 @@ initial();
                         <div class="name">dasd</div>
                         <div class="employeeId">q3142424234</div>
                     </div>
-                    <div class="prize-winner">
-                        <div class="department">dadad</div>
-                        <div class="name">dasd</div>
-                        <div class="employeeId">q3142424234</div>
-                    </div>
                 </div>
             </div>
             <div class="prize_choose_buttons hide" style="z-index: 2;">
