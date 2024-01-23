@@ -728,7 +728,7 @@ const firworks_animation = {
         return div
     },
     generate_speed: function () {
-        let x = (parseInt(Math.random() * 2) == 0 ? 1 : -1) * parseInt(Math.random() * 16 + 1);
+        let x = (parseInt(Math.random() * 2) == 0 ? 1 : -1) * parseInt(Math.random() * 36 + 1);
         let y = (parseInt(Math.random() * 2) == 0 ? 1 : -1) * parseInt(Math.random() * 20 + 1);
         return {x, y}
     },
