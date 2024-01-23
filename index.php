@@ -12,6 +12,23 @@ initial();
     <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body>
+<style>
+    .admin_control {
+        padding: 5px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 9999;
+    }
+
+    .admin_control_button {
+        text-decoration: none;
+        color: white;
+    }
+</style>
+<div class="admin_control">
+    <a class="admin_control_button" href="/admin.php" target="_blank">控制台</a>
+</div>
 <div class="main unselectable">
     <div class="cj-container">
         <div class="cards">

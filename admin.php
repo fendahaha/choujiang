@@ -10,6 +10,9 @@ initial();
     <script src="/static/js/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="/static/css/common.css">
     <style>
+        a{
+            text-decoration: none;
+        }
         body {
             background-color: black;
         }
@@ -171,8 +174,8 @@ initial();
 <body>
 <div class="main">
     <div class="buttons">
-        <button class="button" id="export">导出数据</button>
-        <button class="button" id="reset">重置数据</button>
+        <a class="button" id="export" href="/download.php">导出数据</a>
+        <buton class="button" id="reset">重置数据</buton>
     </div>
     <div class="results">
         <div class="prize_result" style="display: none">
