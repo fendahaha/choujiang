@@ -97,17 +97,39 @@ function get_persons_from_xlsx()
     return $persons;
 }
 
+const temp_dir = __DIR__ . "/temp";
+const prizes_file = temp_dir . '/prizes.json';
+const persons_file = temp_dir . '/persons.json';
+function initial()
+{
+    if (!file_exists(temp_dir)) {
+        mkdir(temp_dir);
+    }
+    if (!file_exists(prizes_file)) {
+        $file = fopen(prizes_file, 'w+');
+        $prizes = get_prizes_from_xlsx();
+        fwrite($file, json_encode($prizes));
+        fclose($file);
+    }
+    if (!file_exists(persons_file)) {
+        $file = fopen(persons_file, 'w+');
+        $prizes = get_persons_from_xlsx();
+        fwrite($file, json_encode($prizes));
+        fclose($file);
+    }
+}
+
 function get_prizes_json_str()
 {
-    return file_get_contents(__DIR__ . "/temp/prizes.json");
+    return file_get_contents(prizes_file);
 }
 
 function get_persons_json_str()
 {
-    return file_get_contents(__DIR__ . "/temp/persons.json");
+    return file_get_contents(persons_file);
 }
 
 function hit_the_jackpot($prizes_json_str)
 {
-    file_put_contents(__DIR__ . "/temp/prizes.json", $prizes_json_str);
+    file_put_contents(prizes_file, $prizes_json_str);
 }

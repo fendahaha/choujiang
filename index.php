@@ -1,5 +1,6 @@
 <?php
-require_once 'initial.php';
+require_once 'util.php';
+initial();
 ?>
 <!DOCTYPE html>
 <html lang="en">

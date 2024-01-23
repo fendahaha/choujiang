@@ -1,5 +1,17 @@
 let arr = [1, 2, 3, 4];
 
+function count_result(result) {
+    let r = arr.map(i => 0);
+    for (let i = 0; i < result.length; i++) {
+        for (let j = 0; j < arr.length; j++) {
+            if (result[i] === arr[j]) {
+                r[j] += 1;
+            }
+        }
+    }
+    console.log(r.map(i => i / result.length).join("    "));
+}
+
 function shift(arr) {
     const random = (n) => Math.floor(Math.random() * n)
     for (let i = arr.length - 1; i > 0; --i) {
@@ -11,28 +23,47 @@ function shift(arr) {
     return arr;
 }
 
-let result = [];
-for (let i = 0; i < 100000; i++) {
-    result.push(shift(arr)[0])
+function test1(n = 100000) {
+    let result = [];
+    for (let i = 0; i < n; i++) {
+        result.push(shift(arr)[0])
+    }
+    count_result(result);
 }
-let r = {
-    '1': 0,
-    '2': 0,
-    '3': 0,
-    '4': 0,
+
+// test1();
+
+function test2(n = 100000) {
+    let result = [];
+    for (let i = 0; i < n; i++) {
+        result.push(arr[Math.floor(Math.random() * 4)])
+    }
+    count_result(result);
 }
-for (let i = 0; i < result.length; i++) {
-    if (result[i] === 1) {
-        r['1'] = r['1'] + 1
+
+// test2(1000);
+
+
+function d() {
+    let r = [];
+    for (let i = 0; i < 100; i++) {
+        r.push(Math.floor(Math.random() * 4))
     }
-    if (result[i] === 2) {
-        r['2'] = r['2'] + 1
-    }
-    if (result[i] === 3) {
-        r['3'] = r['3'] + 1
-    }
-    if (result[i] === 4) {
-        r['4'] = r['4'] + 1
-    }
+    let f = r.reduce((prev, curr) => prev + curr)
+    return f / r.length
 }
-console.log(r['1'] / result.length, r['2'] / result.length, r['3'] / result.length, r['4'] / result.length);
+
+function test3(n = 10) {
+    let result = [];
+    for (let i = 0; i < n; i++) {
+
+        result.push(arr[Math.round(d())])
+        // result.push(arr[Math.floor(Math.random() * 4)])
+    }
+    count_result(result);
+}
+test3()
+
+
+
+
