@@ -706,6 +706,83 @@ const ball_shape_card_animation = {
         return this
     }
 }
+const firworks_animation = {
+    firworks_parent: document.querySelector(".fireworks"),
+    randomColor: function () {
+        let color = "rgb("
+        let r = parseInt(Math.random() * 256);
+        let g = parseInt(Math.random() * 256);
+        let b = parseInt(Math.random() * 256);
+        color = color + r + "," + g + "," + b + ")";
+        return color;
+    },
+    create_div: function (x, y) {
+        let div = document.createElement("div");
+        div.style.backgroundColor = this.randomColor();
+        div.style.width = '4px';
+        div.style.height = '4px';
+        div.style.position = 'absolute';
+        div.style.left = x + "px";
+        div.style.top = y + "px";
+        this.firworks_parent.appendChild(div);
+        return div
+    },
+    generate_speed: function () {
+        let x = (parseInt(Math.random() * 2) == 0 ? 1 : -1) * parseInt(Math.random() * 16 + 1);
+        let y = (parseInt(Math.random() * 2) == 0 ? 1 : -1) * parseInt(Math.random() * 20 + 1);
+        return {x, y}
+    },
+    run: function () {
+        $(".fireworks").remove();
+        $("body").append(`<div class="fireworks"></div>`);
+        this.firworks_parent = $(".fireworks")[0];
+        const width = this.firworks_parent.offsetWidth;
+        const height = this.firworks_parent.offsetHeight;
+        const x = width / 2;
+        const y = height / 2
+
+        const _this = this;
+        let items = [];
+        let speeds = [];
+        [...Array(200).keys()].forEach(i => {
+            items.push(_this.create_div(x, y));
+            speeds.push(_this.generate_speed());
+        })
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                let i = 3;
+                const intervalId = setInterval(() => {
+                    i++;
+                    let indexs = [];
+                    items.forEach((div, index) => {
+                        const speed = speeds[index];
+                        div.style.left = parseInt(div.style.left) + speed.x + "px";
+                        div.style.top = parseInt(div.style.top) + speed.y + i + "px";
+                        let left = parseInt(div.style.left);
+                        let top = parseInt(div.style.top);
+                        if (left > width
+                            || top > height
+                            || left < 2
+                            || top < 2) {
+                            div.remove();
+                            indexs.push(index);
+                        }
+                    })
+                    items = items.filter((e, i) => {
+                        return !indexs.includes(i);
+                    })
+                    speeds = speeds.filter((e, i) => {
+                        return !indexs.includes(i);
+                    })
+                    if (items.length <= 0) {
+                        clearInterval(intervalId);
+                        $(".fireworks").remove();
+                    }
+                }, 30)
+            })
+        })
+    },
+}
 /**############################*/
 const buttons_manager = {
     hideAll: () => {
@@ -783,6 +860,7 @@ const event_manager = {
                     person_manager.show(choose_person).then(() => {
                         const card_id = $(`[person-id='${choose_person.id}']`).attr('id');
                         ball_shape_card_animation.show_card(card_id).finished.then(() => {
+                            firworks_animation.run();
                             buttons_manager.show('confirm_lottery', 'cancel_lottery');
                             this.is_lottery = false;
                             this.loading = false;

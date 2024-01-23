@@ -18,18 +18,29 @@ initial();
         position: absolute;
         top: 10px;
         right: 10px;
-        z-index: 9999;
+        z-index: 1;
     }
 
     .admin_control_button {
         text-decoration: none;
         color: white;
     }
+
+    .fireworks {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0);
+        overflow: hidden;
+        z-index: 2;
+    }
 </style>
 <div class="admin_control">
     <a class="admin_control_button" href="/admin.php" target="_blank">控制台</a>
 </div>
-<div class="main unselectable">
+<div class="main unselectable" style="z-index: 0;">
     <div class="cj-container">
         <div class="cards">
             <div class="card" id="card-0">
