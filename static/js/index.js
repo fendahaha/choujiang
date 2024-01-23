@@ -178,10 +178,13 @@ const prize_choose_person = {
         this.choose_person = _persons[index];
         return this.choose_person
     },
+    clear_choose: function () {
+        this.choose_person = null;
+    },
     get_lottery_persons: function () {
         const prize = prizes[prize_manager.current_prize_index];
         const level = prize.level;
-        const lottery_persons = persons.filter(p => p.level === level).filter(p => {
+        const lottery_persons = persons.filter(p => p.can).filter(p => p.level === level).filter(p => {
             return !p['hit_the_jackpot'];
         })
         return lottery_persons
@@ -781,7 +784,7 @@ const event_manager = {
                     person_manager.show(choose_person).then(() => {
                         const card_id = $(`[person-id='${choose_person.id}']`).attr('id');
                         ball_shape_card_animation.show_card(card_id).finished.then(() => {
-                            buttons_manager.show('confirm_lottery');
+                            buttons_manager.show('confirm_lottery', 'cancel_lottery');
                             this.is_lottery = false;
                             this.loading = false;
                         })
@@ -805,6 +808,22 @@ const event_manager = {
             })
         }
     },
+    cancel_lottery: function () {
+        if (!this.loading) {
+            if (!confirm("是否取消")) {
+                return
+            }
+            this.loading = true;
+            buttons_manager.show_loading();
+            prize_choose_person.clear_choose();
+            ball_shape_card_animation.not_show_card().finished.then(() => {
+                person_manager.start_updating();
+                buttons_manager.show('start_lottery', 'quit_lottery');
+                this.loading = false;
+            })
+
+        }
+    }
 }
 /**############################*/
 $("#go_to_lottery").on('click', () => {
@@ -822,6 +841,9 @@ $("#stop_lottery").on('click', () => {
 });
 $("#confirm_lottery").on('click', () => {
     event_manager.confirm_lottery()
+});
+$("#cancel_lottery").on('click', () => {
+    event_manager.cancel_lottery()
 });
 /**############################*/
 $(".prize_choose_next").on('click', () => {

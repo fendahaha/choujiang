@@ -1,3 +1,17 @@
+const clear_data = () => {
+    let data = false;
+    $.ajax({
+        url: '/api.php?action=clear_data',
+        data: null,
+        async: false,
+        dataType: 'json',
+        success: function (d) {
+            data = d;
+        },
+    });
+    return data;
+}
+
 const get_prizes = () => {
     let data = [];
     $.ajax({

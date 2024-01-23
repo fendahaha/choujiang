@@ -82,6 +82,10 @@ initial();
             <span class="state">Loading...</span>
             <span class="name">确定抽奖</span>
         </button>
+        <button class="button" id="cancel_lottery">
+            <span class="state">Loading...</span>
+            <span class="name">取消抽奖</span>
+        </button>
     </div>
 </div>
 <script src="/static/js/api.js"></script>

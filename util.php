@@ -123,6 +123,19 @@ function initial()
     }
 }
 
+function clear_data()
+{
+    if (file_exists(prizes_file)) {
+        unlink(prizes_file);
+    }
+    if (file_exists(persons_file)) {
+        unlink(persons_file);
+    }
+    if (file_exists(temp_dir)) {
+        rmdir(temp_dir);
+    }
+}
+
 function get_prizes_json_str()
 {
     return file_get_contents(prizes_file);

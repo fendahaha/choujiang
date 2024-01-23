@@ -50,6 +50,7 @@ initial();
         .prize_result {
             padding: 0 20px;
             border-top: 1px dashed rgba(127, 255, 255, 0.75);
+            /*border-top: 1px dashed white;*/
         }
 
         .prize {
@@ -69,6 +70,26 @@ initial();
         .prize_persons > * {
             flex: 0 0 auto;
         }
+
+        /*########################*/
+        /*定义滚动条*/
+        ::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            background-color: #555;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+            background-color: rgba(127, 255, 255, 0.75);
+        }
+
+        /*########################*/
     </style>
     <style>
         .card {
@@ -150,8 +171,8 @@ initial();
 <body>
 <div class="main">
     <div class="buttons">
-        <button class="button">导出数据</button>
-        <button class="button">重置数据</button>
+        <button class="button" id="export">导出数据</button>
+        <button class="button" id="reset">重置数据</button>
     </div>
     <div class="results">
         <div class="prize_result" style="display: none">
@@ -195,6 +216,20 @@ initial();
     }
 
     $(".results").empty().append(prizes.map(prize => create_prize_result(prize)).join(""));
+    let loading = false;
+    $("#reset").on('click', () => {
+        if (!loading) {
+            loading = true;
+            if (confirm("是否重置")) {
+                if (clear_data()) {
+                    alert("已重置数据");
+                } else {
+                    alert("重置失败");
+                }
+            }
+            loading = false;
+        }
+    });
 </script>
 </body>
 </html>
