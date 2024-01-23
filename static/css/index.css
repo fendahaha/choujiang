@@ -125,6 +125,7 @@
     padding: 10px 20px;
     cursor: pointer;
     margin: 0 10px;
+    display: none;
 }
 
 .buttons .button .state {

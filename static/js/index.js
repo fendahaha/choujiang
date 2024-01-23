@@ -1,23 +1,24 @@
-// let prizes = [
-//     {id: '1', name: '現金20萬', total: 1, winners: []},
-//     {id: '2', name: '現金10萬', total: 1, winners: []},
-//     {id: '3', name: '現金8萬', total: 1, winners: []},
-//     {id: '4', name: 'Macbook air M2 13-inch 512GB', total: 1, winners: []},
-//     {id: '5', name: 'iphone 15pro max 256GB', total: 2, winners: []},
-//     {id: '6', name: 'iphone 15 256GB', total: 2, winners: []},
-//     {id: '7', name: '現金5萬', total: 2, winners: []},
-//     {id: '8', name: 'iPad mini 256GB', total: 2, winners: []},
-//     {id: '9', name: '現金3萬', total: 2, winners: []},
-//     {id: '10', name: '現金2萬', total: 3, winners: []},
-//     {id: '11', name: '現金1萬', total: 8, winners: []},
-//     {id: '12', name: '現金3萬', total: 2, winners: []},
-//     {id: '13', name: 'Airpods Max', total: 1, winners: []},
-//     {id: '14', name: 'Apple watch series 9', total: 1, winners: []},
-//     {id: '15', name: '現金2萬', total: 5, winners: []},
-//     {id: '16', name: '現金1萬', total: 6, winners: []},
-// ];
+const cards = [...Array(119).keys()];
+const cards_render = () => {
+    const cards_html = cards.map((i) => {
+        return `<div class="card" id="card-${i}">
+                <div class="card-back"></div>
+                <div class="card-front">
+                    <div class="card-front-1">LG</div>
+                    <div class="card-front-2">${i}</div>
+                    <div class="card-front-3">000000000</div>
+                </div>
+            </div>`
+    }).join('');
+    $(".cards").empty().append(cards_html);
+}
+/**############################*/
 let prizes = get_prizes();
 prizes.reverse();
+let persons = get_persons();
+console.log(prizes);
+console.log(persons);
+/**############################*/
 const bcr = $(".prizes-container-content0")[0].getBoundingClientRect();
 const prize_manager = {
     current_prize_index: 0,
@@ -38,7 +39,6 @@ const prize_manager = {
             fill: "forwards", easing: "ease-in", duration: 400, iterations: 1,
         };
         this.last_animation = $(`#prize-${curr.id}`)[0].animate(keyframes, options);
-        return true
     },
     prize_finished: function (index) {
         index = index ? index : this.current_prize_index;
@@ -168,29 +168,16 @@ const prize_manager = {
         })
     }
 }
+const prize_choose_person = {
+    choose_person: null,
+    random_choose: function () {
+        const _persons = persons;
+        const index = Math.floor(Math.random() * _persons.length);
+        this.choose_person = _persons[index];
+        return this.choose_person
+    },
+}
 /**############################*/
-const cards = [...Array(119).keys()];
-const cards_html = cards.map((i) => {
-    return `<div class="card" id="card-${i}">
-                <div class="card-back"></div>
-                <div class="card-front">
-                    <div class="card-front-1">LG</div>
-                    <div class="card-front-2">${i}</div>
-                    <div class="card-front-3">000000000</div>
-                </div>
-            </div>`
-}).join('');
-$(".cards").empty().append(cards_html);
-/**############################*/
-// let persons = [...Array(130).keys()].map(e => {
-//     return {
-//         id: `p-${e}`,
-//         name: `p-${e}`,
-//         employeeId: '251900006',
-//         department: '研发',
-//     }
-// });
-let persons = get_persons();
 const persons_show = persons.slice(0, cards.length);
 const persons_hide = persons.slice(cards.length);
 const person_manager = {
@@ -295,16 +282,6 @@ const person_manager = {
         return this
     },
 };
-const person_random_choose = {
-    choose_person: null,
-    random_choose: function () {
-        const _persons = persons;
-        const index = Math.floor(Math.random() * _persons.length);
-        this.choose_person = _persons[index];
-        return this.choose_person
-    },
-}
-person_manager.upload();
 /**############################*/
 const word_2023 = {
     get_cards: () => {
@@ -790,7 +767,7 @@ const event_manager = {
             if (this.is_lottery) {
                 buttons_manager.show_loading();
                 cards_container_animation.stop_rotate().then(() => {
-                    const choose_person = person_random_choose.random_choose();
+                    const choose_person = prize_choose_person.random_choose();
                     person_manager.show(choose_person).then(() => {
                         const card_id = $(`[person-id='${choose_person.id}']`).attr('id');
                         ball_shape_card_animation.show_card(card_id).finished.then(() => {
@@ -808,7 +785,7 @@ const event_manager = {
             this.loading = true;
             buttons_manager.show_loading();
             ball_shape_card_animation.not_show_card().finished.then(() => {
-                let success = prize_manager.hit_the_jackpot(person_random_choose.choose_person);
+                let success = prize_manager.hit_the_jackpot(prize_choose_person.choose_person);
                 if (success) {
                     prize_manager.show_winners();
                 }
@@ -847,7 +824,8 @@ $(".prize_choose_prev").on('click', () => {
 /**############################*/
 /**############################*/
 /**############################*/
-$(".buttons button").hide()
+cards_render();
+person_manager.upload();
 rectangular_animation.do_no_animate();
 random_place_animation.do();
 word_2023.init().show();

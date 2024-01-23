@@ -55,7 +55,7 @@ function get_prizes_from_xlsx()
     $activeSheet = $spreadsheet->getActiveSheet();
     $highestRowAndColumn = $activeSheet->getHighestRowAndColumn();
     $h = $highestRowAndColumn['row'];
-    $values = $activeSheet->rangeToArray("A2:B$h");
+    $values = $activeSheet->rangeToArray("A2:C$h");
     $prizes = array();
     foreach ($values as $i => $v) {
         if (trim($v[0])) {
@@ -63,6 +63,7 @@ function get_prizes_from_xlsx()
                 "id" => $i,
                 "name" => trim($v[0]),
                 "total" => intval(trim($v[1])) ?: 0,
+                "level" => trim($v[2]),
                 "winners" => [],
             ];
             array_push($prizes, $prize);
@@ -81,7 +82,7 @@ function get_persons_from_xlsx()
     $activeSheet = $spreadsheet->getActiveSheet();
     $highestRowAndColumn = $activeSheet->getHighestRowAndColumn();
     $h = $highestRowAndColumn['row'];
-    $values = $activeSheet->rangeToArray("A2:C$h");
+    $values = $activeSheet->rangeToArray("A2:E$h");
     $persons = array();
     foreach ($values as $i => $v) {
         if (trim($v[0])) {
@@ -90,6 +91,8 @@ function get_persons_from_xlsx()
                 "name" => trim($v[1]),
                 "employeeId" => trim($v[0]),
                 "department" => trim($v[2]),
+                "level" => trim($v[3]),
+                "can" => strtolower(trim($v[4])) == 'yes',
             ];
             array_push($persons, $p);
         }
