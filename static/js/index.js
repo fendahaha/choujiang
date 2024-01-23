@@ -170,7 +170,6 @@ const prize_manager = {
 }
 /**############################*/
 const cards = [...Array(119).keys()];
-// const cards = [...Array(107).keys()];
 const cards_html = cards.map((i) => {
     return `<div class="card" id="card-${i}">
                 <div class="card-back"></div>
@@ -248,18 +247,34 @@ const person_manager = {
     loading: false,
     is_updating: false,
     start_updating: function () {
+        const _this = this;
         if (!this.loading) {
             this.loading = true;
-            if (persons_hide.length > 0) {
-                if (!this.is_updating) {
-                    this.is_updating = true;
-                    const _this = this;
+            if (!this.is_updating) {
+                this.is_updating = true;
+                if (persons_hide.length > 0) {
                     this.interval_id = setInterval(() => {
                         let show_index = Math.floor(Math.random() * persons_show.length);
                         let hide_index = Math.floor(Math.random() * persons_hide.length);
                         _this.swap(show_index, hide_index);
                         if (!$(`#card-${show_index}`).hasClass('highlight')) {
                             _this.do_animate(show_index);
+                        }
+                    }, 100);
+                } else {
+                    this.interval_id = setInterval(() => {
+                        let show_index = Math.floor(Math.random() * persons_show.length);
+                        let show_index2 = Math.floor(Math.random() * persons_show.length);
+                        _this.update(show_index, persons_show[show_index2]);
+                        _this.update(show_index2, persons_show[show_index]);
+                        let temp = persons_show[show_index];
+                        persons_show[show_index] = persons_show[show_index2];
+                        persons_show[show_index2] = temp;
+                        if (!$(`#card-${show_index}`).hasClass('highlight')) {
+                            _this.do_animate(show_index);
+                        }
+                        if (!$(`#card-${show_index2}`).hasClass('highlight')) {
+                            _this.do_animate(show_index2);
                         }
                     }, 100);
                 }
@@ -793,8 +808,10 @@ const event_manager = {
             this.loading = true;
             buttons_manager.show_loading();
             ball_shape_card_animation.not_show_card().finished.then(() => {
-                prize_manager.hit_the_jackpot(person_random_choose.choose_person);
-                prize_manager.show_winners();
+                let success = prize_manager.hit_the_jackpot(person_random_choose.choose_person);
+                if (success) {
+                    prize_manager.show_winners();
+                }
                 person_manager.start_updating();
                 buttons_manager.show('start_lottery', 'quit_lottery');
                 this.loading = false;
@@ -833,8 +850,8 @@ $(".prize_choose_prev").on('click', () => {
 $(".buttons button").hide()
 rectangular_animation.do_no_animate();
 random_place_animation.do();
+word_2023.init().show();
 random_place_animation.finished.then(() => {
-    word_2023.init().show();
     prize_manager.render();
     person_manager.start_updating();
     buttons_manager.show('go_to_lottery');

@@ -12,7 +12,7 @@ function count_result(result) {
     console.log(r.map(i => i / result.length).join("    "));
 }
 
-function shift(arr) {
+function shuffle(arr) {
     const random = (n) => Math.floor(Math.random() * n)
     for (let i = arr.length - 1; i > 0; --i) {
         let randomIndex = random(i + 1);
@@ -26,7 +26,7 @@ function shift(arr) {
 function test1(n = 100000) {
     let result = [];
     for (let i = 0; i < n; i++) {
-        result.push(shift(arr)[0])
+        result.push(shuffle(arr)[0])
     }
     count_result(result);
 }
