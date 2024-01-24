@@ -8,13 +8,31 @@
 <button id="play">play</button>
 <button id="stop">stop</button>
 <script>
-    const audio = new Audio("/static/media/y2004.wav");
-    audio.loop = true;
+    function create_audio(source) {
+        const audio = new Audio(source);
+        audio.loop = true;
+        audio.autoplay = false;
+        this.play = () => {
+            audio.play();
+        }
+        this.pause = () => {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    }
+
+    const my_audios = {
+        lottery: new create_audio("/static/media/lottery.wav"),
+        handclap: new create_audio("/static/media/handclap.wav"),
+    }
+
     document.getElementById("play").onclick = function () {
-        audio.play()
+        my_audios.handclap.play()
+        my_audios.lottery.play()
     }
     document.getElementById("stop").onclick = function () {
-        audio.pause()
+        my_audios.handclap.pause()
+        my_audios.lottery.pause()
     }
 </script>
 </body>

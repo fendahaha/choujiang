@@ -1,3 +1,38 @@
+function create_audio(source, loop = false) {
+    const audio = new Audio(source);
+    audio.loop = loop;
+    audio.autoplay = false;
+    let time1 = null;
+    let time2 = null;
+    const clear = () => {
+        clearTimeout(time1);
+        clearTimeout(time2);
+    }
+    this.play = (t) => {
+        clear();
+        audio.volume = 1;
+        audio.currentTime = 0;
+        audio.play();
+        if (t) {
+            time1 = setInterval(() => {
+                audio.volume *= 0.9;
+            }, 300)
+            time2 = setTimeout(() => {
+                audio.pause();
+            }, t * 1000);
+        }
+    }
+    this.pause = () => {
+        clear();
+        audio.pause();
+    }
+}
+
+const my_audios = {
+    lottery: new create_audio("/static/media/lottery.wav", true),
+    handclap: new create_audio("/static/media/handclap.wav"),
+}
+/**##########################*/
 const cards = [...Array(119).keys()];
 const cards_render = () => {
     const cards_html = cards.map((i) => {
@@ -223,7 +258,7 @@ const person_manager = {
                         hide_index = i;
                     }
                 });
-                if(hide_index){
+                if (hide_index) {
                     let show_index = Math.floor(Math.random() * persons_show.length);
                     this.swap(show_index, hide_index);
                 }
@@ -844,6 +879,7 @@ const event_manager = {
             if (!this.is_lottery) {
                 buttons_manager.show_loading();
                 person_manager.stop_updating().last_animation_finished.then(() => {
+                    my_audios.lottery.play();
                     cards_container_animation.rotate();
                     buttons_manager.show('stop_lottery');
                     this.is_lottery = true;
@@ -858,11 +894,13 @@ const event_manager = {
             if (this.is_lottery) {
                 buttons_manager.show_loading();
                 cards_container_animation.stop_rotate().then(() => {
+                    my_audios.lottery.pause();
+                    my_audios.handclap.play(6);
                     const choose_person = prize_choose_person.random_choose();
                     person_manager.show(choose_person).then(() => {
                         const card_id = $(`[person-id='${choose_person.id}']`).attr('id');
                         ball_shape_card_animation.show_card(card_id).finished.then(() => {
-                            // firworks_animation.run();
+                            firworks_animation.run();
                             buttons_manager.show('confirm_lottery', 'cancel_lottery');
                             this.is_lottery = false;
                             this.loading = false;
@@ -877,6 +915,7 @@ const event_manager = {
             this.loading = true;
             buttons_manager.show_loading();
             ball_shape_card_animation.not_show_card().finished.then(() => {
+                my_audios.handclap.pause();
                 let success = prize_manager.hit_the_jackpot(prize_choose_person.choose_person);
                 if (success) {
                     prize_manager.show_winners();
@@ -896,6 +935,7 @@ const event_manager = {
             buttons_manager.show_loading();
             prize_choose_person.clear_choose();
             ball_shape_card_animation.not_show_card().finished.then(() => {
+                my_audios.handclap.pause();
                 person_manager.start_updating();
                 buttons_manager.show('start_lottery', 'quit_lottery');
                 this.loading = false;
