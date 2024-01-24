@@ -12,31 +12,6 @@ initial();
     <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body>
-<style>
-    .admin_control {
-        padding: 5px;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 1;
-    }
-
-    .admin_control_button {
-        text-decoration: none;
-        color: white;
-    }
-
-    .fireworks {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0);
-        overflow: hidden;
-        z-index: 2;
-    }
-</style>
 <div class="admin_control">
     <a class="admin_control_button" href="/admin.php" target="_blank">控制台</a>
 </div>

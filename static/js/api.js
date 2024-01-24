@@ -1,4 +1,4 @@
-function shuffle(arr) {
+const shuffle = (arr) => {
     const random = (n) => Math.floor(Math.random() * n)
     for (let i = arr.length - 1; i > 0; --i) {
         let randomIndex = random(i + 1);
