@@ -1,3 +1,15 @@
+function shuffle(arr) {
+    const random = (n) => Math.floor(Math.random() * n)
+    for (let i = arr.length - 1; i > 0; --i) {
+        let randomIndex = random(i + 1);
+        let temp = arr[i];
+        arr[i] = arr[randomIndex];
+        arr[randomIndex] = temp;
+    }
+    return arr;
+}
+
+/**#############################*/
 const clear_data = () => {
     let data = false;
     $.ajax({
@@ -37,7 +49,7 @@ const get_persons = () => {
             data = d;
         },
     });
-    return data;
+    return shuffle(data);
 }
 
 const save_hit_the_jackpot = (prizes) => {

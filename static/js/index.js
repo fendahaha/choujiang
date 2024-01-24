@@ -223,8 +223,10 @@ const person_manager = {
                         hide_index = i;
                     }
                 });
-                let show_index = Math.floor(Math.random() * persons_show.length);
-                this.swap(show_index, hide_index);
+                if(hide_index){
+                    let show_index = Math.floor(Math.random() * persons_show.length);
+                    this.swap(show_index, hide_index);
+                }
             }
         })
     },
@@ -728,7 +730,7 @@ const firworks_animation = {
         return div
     },
     generate_speed: function () {
-        let x = (parseInt(Math.random() * 2) == 0 ? 1 : -1) * parseInt(Math.random() * 36 + 1);
+        let x = (parseInt(Math.random() * 2) == 0 ? 1 : -1) * parseInt(Math.random() * 20 + 1);
         let y = (parseInt(Math.random() * 2) == 0 ? 1 : -1) * parseInt(Math.random() * 20 + 1);
         return {x, y}
     },
@@ -739,7 +741,7 @@ const firworks_animation = {
         const width = this.firworks_parent.offsetWidth;
         const height = this.firworks_parent.offsetHeight;
         const x = width / 2;
-        const y = height / 2
+        const y = height / 2 - 200;
 
         const _this = this;
         let items = [];
@@ -860,7 +862,7 @@ const event_manager = {
                     person_manager.show(choose_person).then(() => {
                         const card_id = $(`[person-id='${choose_person.id}']`).attr('id');
                         ball_shape_card_animation.show_card(card_id).finished.then(() => {
-                            firworks_animation.run();
+                            // firworks_animation.run();
                             buttons_manager.show('confirm_lottery', 'cancel_lottery');
                             this.is_lottery = false;
                             this.loading = false;

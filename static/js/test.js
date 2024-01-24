@@ -62,7 +62,8 @@ function test3(n = 10) {
     }
     count_result(result);
 }
-test3()
+
+// test3()
 
 
 
